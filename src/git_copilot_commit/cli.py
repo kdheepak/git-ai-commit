@@ -59,7 +59,7 @@ def display_file_status(status: GitStatus) -> None:
     console.print(table)
 
 
-def generate_commit_message(repo: GitRepository, status: GitStatus) -> str:
+def generate_commit_message(repo: GitRepository, status: GitStatus, model: str = None) -> str:
     """Generate a conventional commit message using Copilot API."""
 
     # Get recent commits for context
@@ -169,7 +169,7 @@ Avoid wrapping the whole response in triple backticks.
 
 Generate a conventional commit message:"""
 
-    response = client.ask(prompt)
+    response = client.ask(prompt, model=model) if model else client.ask(prompt)
     return response.content
 
 
@@ -179,6 +179,7 @@ def commit(
         False, "--all", "-a", help="Stage all files before committing"
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output"),
+    model: str = typer.Option(None, "--model", "-m", help="Model to use for generating commit message"),
 ):
     """
     Automatically commit changes in the current git repository.
@@ -229,7 +230,7 @@ def commit(
     # Generate or use provided commit message
     console.print("[cyan]Generating commit message...[/cyan]")
     with console.status("[cyan]Generating commit message using Copilot API...[/cyan]"):
-        commit_message = generate_commit_message(repo, status)
+        commit_message = generate_commit_message(repo, status, model)
 
     # Display commit message
     console.print(Panel(commit_message, title="Commit Message", border_style="green"))
