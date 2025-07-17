@@ -221,14 +221,10 @@ def commit(
             if Confirm.ask("Stage modified files?"):
                 repo.stage_modified()
                 console.print("[green]Staged modified files.[/green]")
-            else:
-                raise typer.Exit()
         if status.has_untracked_files:
             if Confirm.ask("Stage untracked files?"):
                 repo.stage_files()
                 console.print("[green]Staged untracked files.[/green]")
-            else:
-                raise typer.Exit()
 
     # Refresh status after staging
     status = repo.get_status()
@@ -346,7 +342,7 @@ def config(
             console.print(f"Default model: [cyan]{default_model}[/cyan]")
         else:
             console.print("Default model: [dim]not set[/dim]")
-        
+
         console.print(f"Config file: [dim]{settings.config_file}[/dim]")
 
 
