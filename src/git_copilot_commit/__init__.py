@@ -1,3 +1,3 @@
-from importlib.metadata import version as get_version
+from .version import __version__
 
-__version__ = get_version(__package__)
+__all__ = ["__version__"]

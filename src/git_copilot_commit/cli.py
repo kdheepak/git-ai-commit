@@ -7,12 +7,13 @@ from rich.console import Console
 from rich.prompt import Confirm
 from rich.panel import Panel
 from rich.table import Table
+import rich
 
 from pycopilot.copilot import Copilot
 from pycopilot.auth import Authentication
 from .git import GitRepository, GitError, NotAGitRepositoryError, GitStatus
 from .settings import Settings
-from . import __version__
+from .version import __version__
 
 console = Console()
 app = typer.Typer(help=__doc__, add_completion=False)
@@ -20,7 +21,7 @@ app = typer.Typer(help=__doc__, add_completion=False)
 
 def version_callback(value: bool):
     if value:
-        typer.echo(__version__)
+        rich.print(f"git-copilot-version [bold green]{__version__}[/]")
         raise typer.Exit()
 
 
