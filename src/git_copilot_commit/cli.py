@@ -153,7 +153,8 @@ If multiple changes are detected, prioritize the most important changes in a sin
 Do not add any body or footer.
 You can only give one reply for each conversation turn.
 
-Avoid wrapping the whole response in triple backticks.
+Avoid wrapping the whole response in triple backticks or single backticks.
+Return the commit message as the output without any additional text, explanations, or formatting markers.
 """
     )
 
