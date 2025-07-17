@@ -1,7 +1,7 @@
 [project]
-name = "git-autocommit"
+name = "git-copilot-commit"
 version = "0.1.0"
-description = "Automatically generate and commit changes using AI"
+description = "Automatically generate and commit changes using copilot"
 readme = "README.md"
 authors = [
   { name = "Dheepak Krishnamurthy", email = "1813121+kdheepak@users.noreply.github.com" },
@@ -15,7 +15,7 @@ dependencies = [
 ]
 
 [project.scripts]
-git-autocommit = "git_autocommit.cli:app"
+git-copilot-commit = "git_copilot_commit.cli:app"
 
 [build-system]
 requires = ["hatchling"]

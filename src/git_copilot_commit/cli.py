@@ -1,5 +1,5 @@
 """
-git-autocommit - AI-powered Git commit assistant
+git-copilot-commit - AI-powered Git commit assistant
 """
 
 import typer
@@ -244,9 +244,9 @@ def commit(
     choice = typer.prompt(
         "Choose action: (c)ommit, (e)dit message, (q)uit",
         default="c",
-        show_default=True
+        show_default=True,
     ).lower()
-    
+
     if choice == "q":
         console.print("Commit cancelled.")
         raise typer.Exit()
