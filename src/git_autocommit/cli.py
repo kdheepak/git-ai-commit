@@ -169,12 +169,6 @@ def commit(
     message: Optional[str] = typer.Option(
         None, "--message", "-m", help="Use provided commit message"
     ),
-    dry_run: bool = typer.Option(
-        False, "--dry-run", help="Show what would be committed without committing"
-    ),
-    interactive: bool = typer.Option(
-        False, "--interactive", "-i", help="Interactively stage files"
-    ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output"),
 ):
     """
@@ -201,9 +195,6 @@ def commit(
     if all_files:
         repo.stage_files()  # Stage all files
         console.print("[green]Staged all files.[/green]")
-    elif interactive:
-        # Interactive staging
-        handle_interactive_staging(repo, status)
     else:
         # Check if we need to stage files
         if not status.has_staged_changes:
@@ -264,11 +255,6 @@ def commit(
         console.print("\n[bold]Changes to be committed:[/bold]")
         for file in status.staged_files:
             console.print(f"  {file.staged_status} {file.path}")
-
-    # Dry run mode
-    if dry_run:
-        console.print("\n[yellow]DRY RUN - No actual commit will be made[/yellow]")
-        return
 
     # Confirm commit
     if not message and not Confirm.ask("Do you want to commit with this message?"):
