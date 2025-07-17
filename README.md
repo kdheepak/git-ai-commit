@@ -52,7 +52,7 @@ pipx install git-copilot-commit
 
 ## Usage
 
-#### `commit`
+### `commit`
 
 Automatically commit changes in the current git repository:
 
@@ -74,7 +74,7 @@ git-copilot-commit commit
    - `(e)dit`: Edit the message in your git-configured editor
    - `(q)uit`: Cancel the commit
 
-#### `authenticate`
+### `authenticate`
 
 Set up authentication with GitHub Copilot:
 
@@ -82,7 +82,7 @@ Set up authentication with GitHub Copilot:
 git-copilot-commit authenticate
 ```
 
-#### `models`
+### `models`
 
 List available AI models:
 
@@ -90,7 +90,7 @@ List available AI models:
 git-copilot-commit models
 ```
 
-#### `config`
+### `config`
 
 Manage application configuration:
 
@@ -102,7 +102,7 @@ git-copilot-commit config --show
 git-copilot-commit config --set-default-model gpt-4o
 ```
 
-### Examples
+## Examples
 
 **Commit all changes with staging prompts:**
 
