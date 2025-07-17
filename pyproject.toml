@@ -11,7 +11,7 @@ dependencies = [
   "pycopilot>=0.1.6",
   "rich>=14.0.0",
   "typer>=0.16.0",
-  "xdg-base-dirs>=6.0.2",
+  "platformdirs>=4.0.0",
 ]
 
 [project.scripts]

@@ -1,28 +1,30 @@
 """
-Settings management using XDG Base Directory specification.
+Settings management using platformdirs for cross-platform directory paths.
 """
 
 import json
 from typing import Any
 
-from xdg_base_dirs import (
-    xdg_cache_home,
-    xdg_config_home,
-    xdg_data_home,
-    xdg_state_home,
+from platformdirs import (
+    user_cache_dir,
+    user_config_dir,
+    user_data_dir,
+    user_state_dir,
 )
 
 
 class Settings:
-    """Manages application settings using XDG Base Directory specification."""
+    """Manages application settings using platformdirs for cross-platform directory paths."""
 
     APP_NAME = "git-copilot-commit"
 
     def __init__(self):
-        self.config_dir = xdg_config_home() / self.APP_NAME
-        self.data_dir = xdg_data_home() / self.APP_NAME
-        self.cache_dir = xdg_cache_home() / self.APP_NAME
-        self.state_dir = xdg_state_home() / self.APP_NAME
+        from pathlib import Path
+        
+        self.config_dir = Path(user_config_dir(f"com.kdheepak.{self.APP_NAME}"))
+        self.data_dir = Path(user_data_dir(f"com.kdheepak.{self.APP_NAME}"))
+        self.cache_dir = Path(user_cache_dir(f"com.kdheepak.{self.APP_NAME}"))
+        self.state_dir = Path(user_state_dir(f"com.kdheepak.{self.APP_NAME}"))
 
         self.config_file = self.config_dir / "config.json"
 
