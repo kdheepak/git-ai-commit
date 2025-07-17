@@ -240,9 +240,25 @@ def commit(
         for file in status.staged_files:
             console.print(f"  {file.staged_status} {file.path}")
 
-    # Confirm commit
-    if not Confirm.ask("Do you want to commit with this message?"):
+    # Confirm commit or edit message
+    choice = typer.prompt(
+        "Choose action: (c)ommit, (e)dit message, (q)uit",
+        default="c",
+        show_default=True
+    ).lower()
+    
+    if choice == "q":
         console.print("Commit cancelled.")
+        raise typer.Exit()
+    elif choice == "e":
+        edited_message = typer.edit(commit_message)
+        if edited_message is None:
+            console.print("Edit cancelled.")
+            raise typer.Exit()
+        commit_message = edited_message.strip()
+        console.print(Panel(commit_message, title="Edited Commit Message", border_style="green"))
+    elif choice != "c":
+        console.print("Invalid choice. Commit cancelled.")
         raise typer.Exit()
 
     # Perform commit
