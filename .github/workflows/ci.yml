@@ -21,10 +21,10 @@ jobs:
         run: uv sync --locked --all-extras --dev
 
       - name: Run linting
-        run: uv run ruff check
+        run: uvx ruff check
 
       - name: Run type checking
-        run: uv run ty check
+        run: uvx ty check
 
   publish:
     if: github.event_name == 'release' && github.event.action == 'published'
