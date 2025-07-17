@@ -152,7 +152,7 @@ Add a git alias by adding the following to your `~/.gitconfig`:
 
 ```ini
 [alias]
-    ai-commit = "!f() { uvx git-copilot-commit commit "$@"; }; f"
+    ai-commit = "!f() { uvx git-copilot-commit commit $@; }; f"
 ```
 
 Now you can run:
