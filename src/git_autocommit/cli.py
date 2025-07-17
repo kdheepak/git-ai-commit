@@ -1,3 +1,26 @@
+"""
+git-autocommit - AI-powered Git commit assistant
+
+A command-line tool that uses GitHub Copilot to automatically generate
+conventional commit messages based on your staged changes. It analyzes
+your git diff and recent commit history to create meaningful, consistent
+commit messages following the Conventional Commits specification.
+
+Features:
+  • Automatic commit message generation using AI
+  • Interactive file staging
+  • Conventional Commits format (feat, fix, docs, etc.)
+  • Rich terminal UI with colored output
+  • Support for custom commit messages
+
+Usage:
+  git-autocommit commit              # Generate and commit with AI message
+  git-autocommit commit -a           # Stage all files and commit
+  git-autocommit commit -m "..."     # Commit with custom message
+  git-autocommit authenticate        # Set up GitHub Copilot access
+  git-autocommit models              # List available AI models
+"""
+
 from typing import Optional
 import typer
 from rich.console import Console
@@ -175,9 +198,6 @@ def commit(
     all_files: bool = typer.Option(
         False, "--all", "-a", help="Stage all files before committing"
     ),
-    message: Optional[str] = typer.Option(
-        None, "--message", "-m", help="Use provided commit message"
-    ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output"),
 ):
     """
@@ -206,7 +226,19 @@ def commit(
         console.print("[green]Staged all files.[/green]")
     else:
         # Check if we need to stage files
-        if not status.has_staged_changes:
+        if status.has_unstaged_changes:
+            if Confirm.ask("Stage modified files?"):
+                repo.stage_modified()
+                console.print("[green]Staged modified files.[/green]")
+            else:
+                raise typer.Exit()
+        elif status.has_untracked_files:
+            if Confirm.ask("Stage untracked files?"):
+                repo.stage_files()
+                console.print("[green]Staged untracked files.[/green]")
+            else:
+                raise typer.Exit()
+        elif not status.has_staged_changes:
             console.print("[yellow]No staged changes found.[/yellow]")
 
             # Offer to stage files based on what's available
@@ -226,18 +258,6 @@ def commit(
                 else:
                     console.print("No files staged.")
                     raise typer.Exit()
-            elif status.has_unstaged_changes:
-                if Confirm.ask("Stage modified files?"):
-                    repo.stage_modified()
-                    console.print("[green]Staged modified files.[/green]")
-                else:
-                    raise typer.Exit()
-            elif status.has_untracked_files:
-                if Confirm.ask("Stage untracked files?"):
-                    repo.stage_files()
-                    console.print("[green]Staged untracked files.[/green]")
-                else:
-                    raise typer.Exit()
 
     # Refresh status after staging
     status = repo.get_status()
@@ -247,14 +267,9 @@ def commit(
         raise typer.Exit()
 
     # Generate or use provided commit message
-    if message:
-        commit_message = message
-    else:
-        console.print("[cyan]Generating commit message...[/cyan]")
-        with console.status(
-            "[cyan]Generating commit message using Copilot API...[/cyan]"
-        ):
-            commit_message = generate_commit_message(repo, status)
+    console.print("[cyan]Generating commit message...[/cyan]")
+    with console.status("[cyan]Generating commit message using Copilot API...[/cyan]"):
+        commit_message = generate_commit_message(repo, status)
 
     # Display commit message
     console.print(Panel(commit_message, title="Commit Message", border_style="green"))
@@ -266,7 +281,7 @@ def commit(
             console.print(f"  {file.staged_status} {file.path}")
 
     # Confirm commit
-    if not message and not Confirm.ask("Do you want to commit with this message?"):
+    if not Confirm.ask("Do you want to commit with this message?"):
         console.print("Commit cancelled.")
         raise typer.Exit()
 
