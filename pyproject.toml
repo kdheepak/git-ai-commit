@@ -1,6 +1,6 @@
 [project]
 name = "git-copilot-commit"
-version = "0.1.4"
+version = "0.1.5"
 description = "Automatically generate and commit changes using copilot"
 readme = "README.md"
 authors = [
