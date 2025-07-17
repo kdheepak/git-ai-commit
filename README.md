@@ -6,10 +6,8 @@ AI-powered Git commit assistant that generates conventional commit messages usin
 
 - Generates commit messages based on your staged changes
 - Supports multiple AI models: GPT-4, Claude, Gemini, and more
-- Lets you set a default model for all commits
 - Allows editing of generated messages before committing
 - Follows the [Conventional Commits](https://www.conventionalcommits.org/) standard
-- Provides clear terminal output with syntax highlighting
 
 ## Installation
 
