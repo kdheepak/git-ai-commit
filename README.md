@@ -32,8 +32,7 @@ pipx install git-copilot-commit
 
 ## Prerequisites
 
-1. **GitHub Copilot Access**: You need an active GitHub Copilot subscription
-2. **Authentication**: Authenticate with GitHub Copilot before first use
+**GitHub Copilot Access**: You need an active GitHub Copilot subscription
 
 ## Quick Start
 
