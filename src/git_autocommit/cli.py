@@ -1,27 +1,7 @@
 """
 git-autocommit - AI-powered Git commit assistant
-
-A command-line tool that uses GitHub Copilot to automatically generate
-conventional commit messages based on your staged changes. It analyzes
-your git diff and recent commit history to create meaningful, consistent
-commit messages following the Conventional Commits specification.
-
-Features:
-  • Automatic commit message generation using AI
-  • Interactive file staging
-  • Conventional Commits format (feat, fix, docs, etc.)
-  • Rich terminal UI with colored output
-  • Support for custom commit messages
-
-Usage:
-  git-autocommit commit              # Generate and commit with AI message
-  git-autocommit commit -a           # Stage all files and commit
-  git-autocommit commit -m "..."     # Commit with custom message
-  git-autocommit authenticate        # Set up GitHub Copilot access
-  git-autocommit models              # List available AI models
 """
 
-from typing import Optional
 import typer
 from rich.console import Console
 from rich.prompt import Confirm
