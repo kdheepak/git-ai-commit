@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 from dataclasses import dataclass
-from typing import List, Tuple, Optional, Union
+from typing import List, Tuple, Optional
 from enum import Enum
 
 
