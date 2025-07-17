@@ -1,72 +1,62 @@
-import os
-import subprocess
-from pathlib import Path
-import tempfile
+# Refactored commit function using GitRepository class
 
+from typing import Optional
 import typer
 from rich.console import Console
-from rich.progress import (
-    Progress,
-    SpinnerColumn,
-    TextColumn,
-    BarColumn,
-    DownloadColumn,
-    TransferSpeedColumn,
-)
-from rich.table import Table
 from rich.prompt import Confirm
 from rich.panel import Panel
+from rich.table import Table
 
 from pycopilot.copilot import Copilot
 from pycopilot.auth import Authentication
+from .git import GitRepository, GitError, NotAGitRepositoryError, GitStatus
 
-# Configure console
 console = Console()
-
-app = typer.Typer(name=__name__, help=__doc__, add_completion=False)
-
-
-SCRIPT_NAME = f"./{Path(__file__).name}"
+app = typer.Typer()
 
 
-def get_git_status():
-    """Get git status, staged changes, and unstaged changes."""
-    try:
-        status_result = subprocess.run(
-            ["git", "status", "--porcelain"], capture_output=True, text=True, check=True
-        )
+def display_file_status(status: GitStatus) -> None:
+    """Display file status in a rich table."""
+    if not status.files:
+        return
 
-        diff_result = subprocess.run(
-            ["git", "diff", "--staged"], capture_output=True, text=True, check=True
-        )
+    table = Table(title="Git Status")
+    table.add_column("Status", style="yellow", width=8)
+    table.add_column("File", style="white")
 
-        unstaged_diff = subprocess.run(
-            ["git", "diff"], capture_output=True, text=True, check=True
-        )
+    # Group files by status
+    staged = status.staged_files
+    unstaged = status.unstaged_files
+    untracked = status.untracked_files
 
-        untracked_files = subprocess.run(
-            ["git", "ls-files", "--others", "--exclude-standard"],
-            capture_output=True,
-            text=True,
-            check=True,
-        )
+    if staged:
+        table.add_row("[green]Staged[/green]", "", style="dim")
+        for file in staged:
+            table.add_row(f"  {file.staged_status}", file.path)
 
-        return (
-            status_result.stdout.strip(),
-            diff_result.stdout.strip(),
-            unstaged_diff.stdout.strip(),
-            untracked_files.stdout.strip(),
-        )
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Git command failed: {e}[/red]")
-        raise typer.Exit(1)
+    if unstaged:
+        table.add_row("[yellow]Unstaged[/yellow]", "", style="dim")
+        for file in unstaged:
+            table.add_row(f"  {file.status}", file.path)
+
+    if untracked:
+        table.add_row("[red]Untracked[/red]", "", style="dim")
+        for file in untracked:
+            table.add_row("  ?", file.path)
+
+    console.print(table)
 
 
-def generate_commit_message(status_output, diff_output):
+def generate_commit_message(repo: GitRepository, status: GitStatus) -> str:
     """Generate a conventional commit message using Copilot API."""
+
+    # Get recent commits for context
+    recent_commits = repo.get_recent_commits(limit=5)
+    recent_commits_text = "\n".join([f"- {msg}" for _, msg in recent_commits])
 
     client = Copilot(
         system_prompt="""
+
 You are a Git commit message assistant trained to write a single clear, structured, and informative commit message following the Conventional Commits specification based on the provided `git diff --staged` output.
 
 Output format: Provide only the commit message without any additional text, explanations, or formatting markers.
@@ -152,124 +142,206 @@ Avoid wrapping the whole response in triple backticks.
 """
     )
 
-    prompt = "`git status`:\n```\n\n{status_output}\n```\n\n`git diff --staged`:\n\n```\n{diff_output}\n```\n\nGenerate a conventional commit message:"
-    response = client.ask(
-        prompt.format(status_output=status_output, diff_output=diff_output),
-    )
+    prompt = f"""Recent commits:
+{recent_commits_text}
+
+`git status`:
+```
+{status.get_porcelain_output()}
+```
+
+`git diff --staged`:
+```
+{status.staged_diff}
+```
+
+Generate a conventional commit message:"""
+
+    response = client.ask(prompt)
     return response.content
+
+
+@app.command()
+def commit(
+    all_files: bool = typer.Option(
+        False, "--all", "-a", help="Stage all files before committing"
+    ),
+    message: Optional[str] = typer.Option(
+        None, "--message", "-m", help="Use provided commit message"
+    ),
+    dry_run: bool = typer.Option(
+        False, "--dry-run", help="Show what would be committed without committing"
+    ),
+    interactive: bool = typer.Option(
+        False, "--interactive", "-i", help="Interactively stage files"
+    ),
+    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output"),
+):
+    """
+    Automatically commit changes in the current git repository.
+    """
+    try:
+        repo = GitRepository()
+    except NotAGitRepositoryError:
+        console.print("[red]Error: Not in a git repository[/red]")
+        raise typer.Exit(1)
+
+    # Get initial status
+    status = repo.get_status()
+
+    if not status.files:
+        console.print("[yellow]No changes to commit.[/yellow]")
+        raise typer.Exit()
+
+    # Display current status
+    if verbose:
+        display_file_status(status)
+
+    # Handle staging based on options
+    if all_files:
+        repo.stage_files()  # Stage all files
+        console.print("[green]Staged all files.[/green]")
+    elif interactive:
+        # Interactive staging
+        handle_interactive_staging(repo, status)
+    else:
+        # Check if we need to stage files
+        if not status.has_staged_changes:
+            console.print("[yellow]No staged changes found.[/yellow]")
+
+            # Offer to stage files based on what's available
+            if status.has_untracked_files and status.has_unstaged_changes:
+                choice = console.input(
+                    "Stage [a]ll files, [m]odified only, [s]elect interactively, or [q]uit? "
+                ).lower()
+
+                if choice == "a":
+                    repo.stage_files()
+                    console.print("[green]Staged all files.[/green]")
+                elif choice == "m":
+                    repo.stage_modified()
+                    console.print("[green]Staged modified files.[/green]")
+                elif choice == "s":
+                    handle_interactive_staging(repo, status)
+                else:
+                    console.print("No files staged.")
+                    raise typer.Exit()
+            elif status.has_unstaged_changes:
+                if Confirm.ask("Stage modified files?"):
+                    repo.stage_modified()
+                    console.print("[green]Staged modified files.[/green]")
+                else:
+                    raise typer.Exit()
+            elif status.has_untracked_files:
+                if Confirm.ask("Stage untracked files?"):
+                    repo.stage_files()
+                    console.print("[green]Staged untracked files.[/green]")
+                else:
+                    raise typer.Exit()
+
+    # Refresh status after staging
+    status = repo.get_status()
+
+    if not status.has_staged_changes:
+        console.print("[yellow]No staged changes to commit.[/yellow]")
+        raise typer.Exit()
+
+    # Generate or use provided commit message
+    if message:
+        commit_message = message
+    else:
+        console.print("[cyan]Generating commit message...[/cyan]")
+        with console.status(
+            "[cyan]Generating commit message using Copilot API...[/cyan]"
+        ):
+            commit_message = generate_commit_message(repo, status)
+
+    # Display commit message
+    console.print(Panel(commit_message, title="Commit Message", border_style="green"))
+
+    # Show what will be committed in verbose mode
+    if verbose:
+        console.print("\n[bold]Changes to be committed:[/bold]")
+        for file in status.staged_files:
+            console.print(f"  {file.staged_status} {file.path}")
+
+    # Dry run mode
+    if dry_run:
+        console.print("\n[yellow]DRY RUN - No actual commit will be made[/yellow]")
+        return
+
+    # Confirm commit
+    if not message and not Confirm.ask("Do you want to commit with this message?"):
+        console.print("Commit cancelled.")
+        raise typer.Exit()
+
+    # Perform commit
+    try:
+        commit_sha = repo.commit(commit_message)
+        console.print(
+            f"[green]✓ Successfully committed: {commit_sha[:8]}[/green]\n"
+            f"[green]Message: {commit_message}[/green]"
+        )
+    except GitError as e:
+        console.print(f"[red]Commit failed: {e}[/red]")
+        raise typer.Exit(1)
+
+
+def handle_interactive_staging(repo: GitRepository, status: GitStatus) -> None:
+    """Handle interactive file staging."""
+    # Combine all files that can be staged
+    stageable_files = [f for f in status.files if not f.is_staged]
+
+    if not stageable_files:
+        console.print("[yellow]No files to stage.[/yellow]")
+        return
+
+    table = Table(title="Select files to stage")
+    table.add_column("Index", style="cyan", width=6)
+    table.add_column("Status", style="yellow", width=8)
+    table.add_column("File", style="white")
+
+    for i, file in enumerate(stageable_files, 1):
+        status_char = file.status if not file.is_untracked else "?"
+        table.add_row(str(i), status_char, file.path)
+
+    console.print(table)
+
+    selection = (
+        console.input(
+            "\nEnter file numbers to stage (comma-separated), 'all', or 'quit': "
+        )
+        .strip()
+        .lower()
+    )
+
+    if selection == "quit":
+        return
+    elif selection == "all":
+        repo.stage_files([f.path for f in stageable_files])
+        console.print(f"[green]Staged {len(stageable_files)} files.[/green]")
+    else:
+        try:
+            indices = [int(x.strip()) - 1 for x in selection.split(",")]
+            files_to_stage = [
+                stageable_files[i].path
+                for i in indices
+                if 0 <= i < len(stageable_files)
+            ]
+
+            if files_to_stage:
+                repo.stage_files(files_to_stage)
+                console.print(f"[green]Staged {len(files_to_stage)} files.[/green]")
+            else:
+                console.print("[yellow]No valid files selected.[/yellow]")
+        except (ValueError, IndexError):
+            console.print("[red]Invalid selection.[/red]")
 
 
 @app.command()
 def authenticate():
     """Autheticate with GitHub Copilot."""
     Authentication().auth()
-
-
-@app.command()
-def commit():
-    """
-    Automatically commit changes in the current git repository.
-    """
-    status_output, diff_output, unstaged_output, untracked_output = get_git_status()
-
-    if not status_output:
-        console.print("[yellow]No changes to commit.[/yellow]")
-        raise typer.Exit()
-
-    # Check for untracked files and unstaged changes
-    has_untracked = bool(untracked_output.strip())
-    has_unstaged = bool(unstaged_output.strip())
-
-    # If no staged changes, prompt to stage modified files
-    if not diff_output:
-        console.print("[yellow]No staged changes found.[/yellow]")
-
-        # Check if there are untracked files and prompt to add them
-        if has_untracked:
-            if Confirm.ask(
-                "There are untracked files. Do you want to add all files (git add .)?"
-            ):
-                try:
-                    subprocess.run(["git", "add", "."], check=True)
-                    console.print("[green]Added all files.[/green]")
-                except subprocess.CalledProcessError as e:
-                    console.print(f"[red]Failed to add files: {e}[/red]")
-                    raise typer.Exit(1)
-            else:
-                console.print("No files added.")
-                raise typer.Exit()
-        else:
-            # Only modified files, prompt to stage them
-            if Confirm.ask("Do you want to stage modified files (git add -u)?"):
-                try:
-                    subprocess.run(["git", "add", "-u"], check=True)
-                    console.print("[green]Staged modified files.[/green]")
-                except subprocess.CalledProcessError as e:
-                    console.print(f"[red]Failed to stage files: {e}[/red]")
-                    raise typer.Exit(1)
-            else:
-                console.print("No files staged.")
-                raise typer.Exit()
-
-        # Get updated status and diff after staging
-        status_output, diff_output, unstaged_output, untracked_output = get_git_status()
-
-        if not diff_output:
-            console.print("[yellow]Still no staged changes to commit.[/yellow]")
-            raise typer.Exit()
-    elif has_untracked:
-        # There are staged changes but also untracked files
-        if Confirm.ask(
-            "There are untracked files. Do you want to add them too (git add .)?"
-        ):
-            try:
-                subprocess.run(["git", "add", "."], check=True)
-                console.print("[green]Added untracked files.[/green]")
-                # Get updated status and diff after adding untracked files
-                status_output, diff_output, unstaged_output, untracked_output = (
-                    get_git_status()
-                )
-            except subprocess.CalledProcessError as e:
-                console.print(f"[red]Failed to add untracked files: {e}[/red]")
-                # Continue with existing staged changes
-
-    # Check for unstaged changes and prompt to stage them
-    if has_unstaged:
-        if Confirm.ask(
-            "There are unstaged changes. Do you want to stage modified files (git add -u)?"
-        ):
-            try:
-                subprocess.run(["git", "add", "-u"], check=True)
-                console.print("[green]Staged modified files.[/green]")
-                # Get updated status and diff after staging
-                status_output, diff_output, unstaged_output, untracked_output = (
-                    get_git_status()
-                )
-            except subprocess.CalledProcessError as e:
-                console.print(f"[red]Failed to stage files: {e}[/red]")
-                # Continue with existing staged changes
-
-    console.print("[cyan]Generating commit message...[/cyan]")
-
-    with console.status("[cyan]Generating commit message using Copilot API...[/cyan]"):
-        commit_message = generate_commit_message(status_output, diff_output)
-
-    console.print(
-        Panel(commit_message, title="Generated Commit Message", border_style="green")
-    )
-
-    if not Confirm.ask("Do you want to commit with this message?"):
-        console.print("Autocommit cancelled.")
-        raise typer.Exit()
-
-    try:
-        subprocess.run(["git", "commit", "-m", commit_message], check=True)
-        console.print(
-            f"[green]Successfully committed with message: {commit_message}[/green]"
-        )
-    except subprocess.CalledProcessError as e:
-        console.print(f"[red]Commit failed: {e}[/red]")
-        raise typer.Exit(1)
 
 
 @app.command()
