@@ -162,11 +162,13 @@ Return the commit message as the output without any additional text, explanation
 {recent_commits_text}
 
 `git status`:
+
 ```
 {status.get_porcelain_output()}
 ```
 
 `git diff --staged`:
+
 ```
 {status.staged_diff}
 ```
@@ -243,10 +245,10 @@ def commit(
         raise typer.Exit()
 
     # Generate or use provided commit message
-    console.print("[cyan]Generating commit message...[/cyan]")
     with console.status("[cyan]Generating commit message using Copilot API...[/cyan]"):
         commit_message = generate_commit_message(repo, status, model)
 
+    console.print("[cyan]Generating commit message...[/cyan]")
     # Display commit message
     console.print(Panel(commit_message, title="Commit Message", border_style="green"))
 
