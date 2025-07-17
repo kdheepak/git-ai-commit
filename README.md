@@ -11,7 +11,7 @@ AI-powered Git commit assistant that generates conventional commit messages usin
 
 ## Installation
 
-Install with [uv](https://github.com/astral-sh/uv) (recommended):
+Install with [`uv`] (recommended):
 
 ```bash
 uv tool install git-copilot-commit
@@ -23,11 +23,13 @@ Or with pipx:
 pipx install git-copilot-commit
 ```
 
-Or run directly:
+Or run directly with [`uv`]:
 
 ```bash
 uvx git-copilot-commit --help
 ```
+
+[`uv`]: https://github.com/astral-sh/uv
 
 ## Prerequisites
 
