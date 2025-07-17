@@ -148,10 +148,11 @@ Follows [Conventional Commits](https://www.conventionalcommits.org/):
 
 ## Git Configuration
 
-Add a git alias:
+Add a git alias by adding the following to your `~/.gitconfig`:
 
-```bash
-git config --global alias.ai-commit "!git-copilot-commit commit"
+```ini
+[alias]
+    ai-commit = "!f() { uvx git-copilot-commit commit "$@"; }; f"
 ```
 
 Now you can run:
