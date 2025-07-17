@@ -17,7 +17,7 @@ Install with [`uv`] (recommended):
 uv tool install git-copilot-commit
 ```
 
-Or with pipx:
+Or with `pipx`:
 
 ```bash
 pipx install git-copilot-commit
