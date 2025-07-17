@@ -295,7 +295,7 @@ def commit(
 @app.command()
 def authenticate():
     """Autheticate with GitHub Copilot."""
-    Authentication().try_auth()
+    Authentication().auth()
 
 
 @app.command()
