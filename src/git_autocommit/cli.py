@@ -251,26 +251,26 @@ def commit(
         console.print("Commit cancelled.")
         raise typer.Exit()
     elif choice == "e":
-        edited_message = typer.edit(commit_message)
-        if edited_message is None:
-            console.print("Edit cancelled.")
-            raise typer.Exit()
-        commit_message = edited_message.strip()
-        console.print(Panel(commit_message, title="Edited Commit Message", border_style="green"))
-    elif choice != "c":
+        # Use git's built-in editor with generated message as template
+        console.print("[cyan]Opening git editor...[/cyan]")
+        try:
+            commit_sha = repo.commit(commit_message, use_editor=True)
+        except GitError as e:
+            console.print(f"[red]Commit failed: {e}[/red]")
+            raise typer.Exit(1)
+    elif choice == "c":
+        # Commit with generated message
+        try:
+            commit_sha = repo.commit(commit_message)
+        except GitError as e:
+            console.print(f"[red]Commit failed: {e}[/red]")
+            raise typer.Exit(1)
+    else:
         console.print("Invalid choice. Commit cancelled.")
         raise typer.Exit()
 
-    # Perform commit
-    try:
-        commit_sha = repo.commit(commit_message)
-        console.print(
-            f"[green]✓ Successfully committed: {commit_sha[:8]}[/green]\n"
-            f"[green]Message: {commit_message}[/green]"
-        )
-    except GitError as e:
-        console.print(f"[red]Commit failed: {e}[/red]")
-        raise typer.Exit(1)
+    # Show success message
+    console.print(f"[green]✓ Successfully committed: {commit_sha[:8]}[/green]")
 
 
 def handle_interactive_staging(repo: GitRepository, status: GitStatus) -> None:

@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 from dataclasses import dataclass
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union
 from enum import Enum
 
 
@@ -244,13 +244,13 @@ class GitRepository:
         else:
             self._run_git_command(["reset", "HEAD"] + paths)
 
-    def commit(self, message: str, allow_empty: bool = False) -> str:
+    def commit(self, message: Optional[str] = None, use_editor: bool = False) -> str:
         """
-        Create a commit with the given message.
+        Create a commit with the given message or using git's editor.
 
         Args:
-            message: Commit message.
-            allow_empty: Whether to allow empty commits.
+            message: Commit message. Used as template if use_editor is True.
+            use_editor: Whether to use git's configured editor.
 
         Returns:
             Commit SHA.
@@ -258,11 +258,40 @@ class GitRepository:
         Raises:
             GitCommandError: If commit fails.
         """
-        args = ["commit", "-m", message]
-        if allow_empty:
-            args.append("--allow-empty")
+        if use_editor:
+            import tempfile
+            import os
+            
+            # Create temp file with message as starting point
+            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+                if message:
+                    f.write(message)
+                temp_file = f.name
+            
+            try:
+                args = ["commit", "-e", "-F", temp_file]
+                
+                # Run interactively without capturing output
+                cmd = ["git"] + args
+                subprocess.run(
+                    cmd,
+                    cwd=self.repo_path,
+                    timeout=self.timeout,
+                    check=True,
+                )
+            except subprocess.CalledProcessError:
+                raise GitCommandError(f"Git commit failed: {' '.join(cmd)}")
+            except subprocess.TimeoutExpired:
+                raise GitCommandError(f"Git commit timed out: {' '.join(cmd)}")
+            finally:
+                # Clean up temp file
+                os.unlink(temp_file)
+        else:
+            if message is None:
+                raise ValueError("message is required when use_editor is False")
+            args = ["commit", "-m", message]
 
-        result = self._run_git_command(args)
+            self._run_git_command(args)
 
         # Extract commit SHA from output
         sha_result = self._run_git_command(["rev-parse", "HEAD"])
