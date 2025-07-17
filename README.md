@@ -20,14 +20,18 @@ Install using uv (recommended):
 
 ```bash
 uv tool install git-copilot-commit
-# or
-uvx git-copilot-commit
 ```
 
 Or with pip:
 
 ```bash
 pipx install git-copilot-commit
+```
+
+Or without installing:
+
+```bash
+uvx git-copilot-commit --help
 ```
 
 ## Prerequisites
