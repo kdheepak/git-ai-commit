@@ -232,7 +232,7 @@ def commit(
                 console.print("[green]Staged modified files.[/green]")
             else:
                 raise typer.Exit()
-        elif status.has_untracked_files:
+        if status.has_untracked_files:
             if Confirm.ask("Stage untracked files?"):
                 repo.stage_files()
                 console.print("[green]Staged untracked files.[/green]")
