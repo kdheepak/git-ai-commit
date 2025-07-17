@@ -216,6 +216,11 @@ def commit(
         repo.stage_files()  # Stage all files
         console.print("[green]Staged all files.[/green]")
     else:
+        # Show git status once if there are unstaged or untracked files to prompt about
+        if status.has_unstaged_changes or status.has_untracked_files:
+            git_status_output = repo._run_git_command(["status"])
+            console.print(git_status_output.stdout)
+
         if status.has_unstaged_changes:
             if Confirm.ask("Modified files found. Add all to staging?"):
                 repo.stage_modified()
