@@ -161,3 +161,24 @@ The tool follows the [Conventional Commits](https://www.conventionalcommits.org/
 - `fix(database): handle connection retries properly`
 - `docs(readme): update installation instructions`
 - `refactor(utils): simplify date parsing logic`
+
+## Git Configuration
+
+For the best experience with git-copilot-commit, consider adding this alias for the commit command:
+
+```bash
+# Add a git alias for quick access
+git config --global alias.ai-commit "!git-copilot-commit commit"
+
+# Now you can use:
+git ai-commit
+git ai-commit --model claude-3.5-sonnet
+git ai-commit --all --verbose
+```
+
+You can also configure git to show more context in diffs, which can help when reviewing changes:
+
+```bash
+# Show more context in diffs
+git config --global diff.context 3
+```
