@@ -3,7 +3,7 @@ Settings management using XDG Base Directory specification.
 """
 
 import json
-from typing import Optional, Dict, Any
+from typing import Any
 
 from xdg_base_dirs import (
     xdg_cache_home,
@@ -32,9 +32,9 @@ class Settings:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         self.state_dir.mkdir(parents=True, exist_ok=True)
 
-        self._config: Dict[str, Any] = self._load_config()
+        self._config: dict[str, Any] = self._load_config()
 
-    def _load_config(self) -> Dict[str, Any]:
+    def _load_config(self) -> dict[str, Any]:
         """Load configuration from file."""
         if not self.config_file.exists():
             return {}
@@ -69,7 +69,7 @@ class Settings:
             self._save_config()
 
     @property
-    def default_model(self) -> Optional[str]:
+    def default_model(self) -> str | None:
         """Get the default model."""
         return self.get("default_model")
 

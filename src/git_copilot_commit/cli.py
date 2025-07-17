@@ -3,7 +3,6 @@ git-copilot-commit - AI-powered Git commit assistant
 """
 
 import typer
-from typing import Optional
 from rich.console import Console
 from rich.prompt import Confirm
 from rich.panel import Panel
@@ -61,7 +60,9 @@ def display_file_status(status: GitStatus) -> None:
     console.print(table)
 
 
-def generate_commit_message(repo: GitRepository, status: GitStatus, model: Optional[str] = None) -> str:
+def generate_commit_message(
+    repo: GitRepository, status: GitStatus, model: str | None = None
+) -> str:
     """Generate a conventional commit message using Copilot API."""
 
     # Get recent commits for context
@@ -181,7 +182,9 @@ def commit(
         False, "--all", "-a", help="Stage all files before committing"
     ),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output"),
-    model: Optional[str] = typer.Option(None, "--model", "-m", help="Model to use for generating commit message"),
+    model: str | None = typer.Option(
+        None, "--model", "-m", help="Model to use for generating commit message"
+    ),
 ):
     """
     Automatically commit changes in the current git repository.
@@ -191,7 +194,7 @@ def commit(
     except NotAGitRepositoryError:
         console.print("[red]Error: Not in a git repository[/red]")
         raise typer.Exit(1)
-    
+
     # Load settings and use default model if none provided
     settings = Settings()
     if model is None:
@@ -324,16 +327,18 @@ def models():
 
 @app.command()
 def config(
-    set_default_model: Optional[str] = typer.Option(None, "--set-default-model", help="Set default model for commit messages"),
+    set_default_model: str | None = typer.Option(
+        None, "--set-default-model", help="Set default model for commit messages"
+    ),
     show: bool = typer.Option(False, "--show", help="Show current configuration"),
 ):
     """Manage application configuration."""
     settings = Settings()
-    
+
     if set_default_model:
         settings.default_model = set_default_model
         console.print(f"[green]✓ Default model set to: {set_default_model}[/green]")
-    
+
     if show or (not set_default_model):
         console.print("\n[bold]Current Configuration:[/bold]")
         default_model = settings.default_model
