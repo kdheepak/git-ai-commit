@@ -12,13 +12,25 @@ from pycopilot.copilot import Copilot
 from pycopilot.auth import Authentication
 from .git import GitRepository, GitError, NotAGitRepositoryError, GitStatus
 from .settings import Settings
+from . import __version__
 
 console = Console()
 app = typer.Typer(help=__doc__, add_completion=False)
 
 
+def version_callback(value: bool):
+    if value:
+        typer.echo(__version__)
+        raise typer.Exit()
+
+
 @app.callback(invoke_without_command=True)
-def main(ctx: typer.Context):
+def main(
+    ctx: typer.Context,
+    version: bool = typer.Option(
+        False, "--version", callback=version_callback, help="Show version and exit"
+    ),
+):
     """
     Automatically commit changes in the current git repository.
     """
