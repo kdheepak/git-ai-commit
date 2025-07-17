@@ -1,5 +1,3 @@
-# Refactored commit function using GitRepository class
-
 from typing import Optional
 import typer
 from rich.console import Console
