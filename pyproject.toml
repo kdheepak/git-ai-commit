@@ -1,17 +1,17 @@
 [project]
 name = "git-autocommit"
 version = "0.1.0"
-description = "Add your description here"
+description = "Automatically generate and commit changes using AI"
 readme = "README.md"
 authors = [
-    { name = "Dheepak Krishnamurthy", email = "1813121+kdheepak@users.noreply.github.com" }
+  { name = "Dheepak Krishnamurthy", email = "1813121+kdheepak@users.noreply.github.com" },
 ]
 requires-python = ">=3.12"
 dependencies = [
-    "pycopilot>=0.1.1",
-    "rich>=14.0.0",
-    "typer>=0.16.0",
-    "xdg-base-dirs>=6.0.2",
+  "pycopilot>=0.1.1",
+  "rich>=14.0.0",
+  "typer>=0.16.0",
+  "xdg-base-dirs>=6.0.2",
 ]
 
 [project.scripts]
