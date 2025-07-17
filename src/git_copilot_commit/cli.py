@@ -226,13 +226,15 @@ def commit(
 
         if status.has_unstaged_changes:
             if Confirm.ask(
-                "Modified files found. Add [bold yellow]all unstaged changes[/] to staging?"
+                "Modified files found. Add [bold yellow]all unstaged changes[/] to staging?",
+                default=True,
             ):
                 repo.stage_modified()
                 console.print("[green]Staged modified files.[/green]")
         if status.has_untracked_files:
             if Confirm.ask(
-                "Untracked files found. Add [bold yellow]all untracked files and unstaged changes[/] to staging?"
+                "Untracked files found. Add [bold yellow]all untracked files and unstaged changes[/] to staging?",
+                default=True,
             ):
                 repo.stage_files()
                 console.print("[green]Staged untracked files.[/green]")
