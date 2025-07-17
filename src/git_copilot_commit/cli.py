@@ -273,57 +273,6 @@ def commit(
     console.print(f"[green]✓ Successfully committed: {commit_sha[:8]}[/green]")
 
 
-def handle_interactive_staging(repo: GitRepository, status: GitStatus) -> None:
-    """Handle interactive file staging."""
-    # Combine all files that can be staged
-    stageable_files = [f for f in status.files if not f.is_staged]
-
-    if not stageable_files:
-        console.print("[yellow]No files to stage.[/yellow]")
-        return
-
-    table = Table(title="Select files to stage")
-    table.add_column("Index", style="cyan", width=6)
-    table.add_column("Status", style="yellow", width=8)
-    table.add_column("File", style="white")
-
-    for i, file in enumerate(stageable_files, 1):
-        status_char = file.status if not file.is_untracked else "?"
-        table.add_row(str(i), status_char, file.path)
-
-    console.print(table)
-
-    selection = (
-        console.input(
-            "\nEnter file numbers to stage (comma-separated), 'all', or 'quit': "
-        )
-        .strip()
-        .lower()
-    )
-
-    if selection == "quit":
-        return
-    elif selection == "all":
-        repo.stage_files([f.path for f in stageable_files])
-        console.print(f"[green]Staged {len(stageable_files)} files.[/green]")
-    else:
-        try:
-            indices = [int(x.strip()) - 1 for x in selection.split(",")]
-            files_to_stage = [
-                stageable_files[i].path
-                for i in indices
-                if 0 <= i < len(stageable_files)
-            ]
-
-            if files_to_stage:
-                repo.stage_files(files_to_stage)
-                console.print(f"[green]Staged {len(files_to_stage)} files.[/green]")
-            else:
-                console.print("[yellow]No valid files selected.[/yellow]")
-        except (ValueError, IndexError):
-            console.print("[red]Invalid selection.[/red]")
-
-
 @app.command()
 def authenticate():
     """Autheticate with GitHub Copilot."""
