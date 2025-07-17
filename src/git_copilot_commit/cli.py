@@ -216,13 +216,12 @@ def commit(
         repo.stage_files()  # Stage all files
         console.print("[green]Staged all files.[/green]")
     else:
-        # Check if we need to stage files
         if status.has_unstaged_changes:
-            if Confirm.ask("Stage modified files?"):
+            if Confirm.ask("Modified files found. Add all to staging?"):
                 repo.stage_modified()
                 console.print("[green]Staged modified files.[/green]")
         if status.has_untracked_files:
-            if Confirm.ask("Stage untracked files?"):
+            if Confirm.ask("Untracked files found. Add all to staging?"):
                 repo.stage_files()
                 console.print("[green]Staged untracked files.[/green]")
 
