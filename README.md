@@ -1,34 +1,31 @@
-# git-copilot-commit
+# `git-copilot-commit`
 
-🤖 AI-powered Git commit assistant that automatically generates conventional commit messages using
-GitHub Copilot.
+AI-powered Git commit assistant that generates conventional commit messages using GitHub Copilot.
 
 ## Features
 
-- **AI-Generated Commit Messages**: Uses GitHub Copilot to analyze your staged changes and generate
-  conventional commit messages
-- **Multiple AI Models**: Choose from GPT-4, Claude, Gemini, and other available models
-- **Configurable Defaults**: Set a default model to use across all commits
-- **Message Editing**: Edit generated messages using your git-configured editor or commit directly
-- **Conventional Commits**: Follows the [Conventional Commits](https://www.conventionalcommits.org/)
-  specification
-- **Rich Output**: Beautiful terminal output with syntax highlighting and tables
+- Generates commit messages based on your staged changes
+- Supports multiple AI models: GPT-4, Claude, Gemini, and more
+- Lets you set a default model for all commits
+- Allows editing of generated messages before committing
+- Follows the [Conventional Commits](https://www.conventionalcommits.org/) standard
+- Provides clear terminal output with syntax highlighting
 
 ## Installation
 
-Install using uv (recommended):
+Install with [uv](https://github.com/astral-sh/uv) (recommended):
 
 ```bash
 uv tool install git-copilot-commit
 ```
 
-Or with pip:
+Or with pipx:
 
 ```bash
 pipx install git-copilot-commit
 ```
 
-Or without installing:
+Or run directly:
 
 ```bash
 uvx git-copilot-commit --help
@@ -36,29 +33,27 @@ uvx git-copilot-commit --help
 
 ## Prerequisites
 
-**GitHub Copilot Access**: You need an active GitHub Copilot subscription
+- Active GitHub Copilot subscription
 
 ## Quick Start
 
-1. **Authenticate with GitHub Copilot**:
+1. Authenticate with GitHub Copilot:
 
-   ```bash
-   git-copilot-commit authenticate
-   ```
+```bash
+git-copilot-commit authenticate
+```
 
-2. **Make some changes** in your git repository
+2. Make changes in your repository.
 
-3. **Generate and commit**:
+3. Generate and commit:
 
-   ```bash
-   git-copilot-commit commit
-   ```
+```bash
+git-copilot-commit commit
+```
 
 ## Usage
 
-### `commit`
-
-Automatically commit changes in the current git repository:
+### Commit changes
 
 ```bash
 git-copilot-commit commit
@@ -66,123 +61,109 @@ git-copilot-commit commit
 
 **Options:**
 
-- `--all, -a`: Stage all files before committing
-- `--verbose, -v`: Show verbose output with file details
-- `--model, -m`: Specify which AI model to use for generating the commit message
+- `--all, -a`: Stage all files
+- `--verbose, -v`: Show detailed output
+- `--model, -m`: Choose an AI model
 
-1. The tool analyzes your changes
-2. Prompts you to stage files (if needed)
-3. Generates an AI-powered commit message
-4. Offers three choices:
-   - `(c)ommit`: Commit with the generated message
-   - `(e)dit`: Edit the message in your git-configured editor
-   - `(q)uit`: Cancel the commit
+Workflow:
 
-### `authenticate`
+1. Analyze changes
+2. Prompt to stage files
+3. Generate a commit message
+4. Choose to commit, edit, or cancel
 
-Set up authentication with GitHub Copilot:
+### Authenticate
 
 ```bash
 git-copilot-commit authenticate
 ```
 
-### `models`
-
-List available AI models:
+### List models
 
 ```bash
 git-copilot-commit models
 ```
 
-### `config`
-
-Manage application configuration:
+### Configure
 
 ```bash
-# Show current configuration
 git-copilot-commit config --show
-
-# Set a default model for all commits
 git-copilot-commit config --set-default-model gpt-4o
 ```
 
 ## Examples
 
-**Commit all changes with staging prompts:**
+Commit all changes:
 
 ```bash
 git-copilot-commit commit --all
 ```
 
-**Commit with verbose output:**
+Verbose output:
 
 ```bash
 git-copilot-commit commit --verbose
 ```
 
-**Use a specific AI model:**
+Use a specific model:
 
 ```bash
 git-copilot-commit commit --model claude-3.5-sonnet
 ```
 
-**Set up a default model and use it:**
+Set and use a default model:
 
 ```bash
-# Set default model once
 git-copilot-commit config --set-default-model gpt-4o
-
-# Now all commits will use gpt-4o by default
 git-copilot-commit commit
-
-# Override with a different model when needed
 git-copilot-commit commit --model claude-3.5-sonnet
 ```
 
-## Generated Commit Message Format
+## Commit Message Format
 
-The tool follows the [Conventional Commits](https://www.conventionalcommits.org/) specification:
+Follows [Conventional Commits](https://www.conventionalcommits.org/):
 
 ```
 <type>[optional scope]: <description>
 ```
 
-**Supported Types:**
+**Types:**
 
-- `feat`: A new feature
-- `fix`: A bug fix
-- `docs`: Documentation changes
-- `style`: Code formatting (no logic changes)
-- `refactor`: Code restructuring (no behavior changes)
-- `perf`: Performance improvements
-- `test`: Adding or updating tests
-- `chore`: Maintenance tasks (tooling, dependencies, etc.)
-- `revert`: Reverting previous changes
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation
+- `style`: Formatting only
+- `refactor`: Code restructure
+- `perf`: Performance
+- `test`: Tests
+- `chore`: Maintenance
+- `revert`: Revert changes
 
-**Example Messages:**
+**Examples:**
 
-- `feat(auth): add user authentication with JWT`
-- `fix(database): handle connection retries properly`
-- `docs(readme): update installation instructions`
-- `refactor(utils): simplify date parsing logic`
+- `feat(auth): add JWT authentication`
+- `fix(db): retry connection on failure`
+- `docs(readme): update install steps`
+- `refactor(utils): simplify date parsing`
 
 ## Git Configuration
 
-For the best experience with git-copilot-commit, consider adding this alias for the commit command:
+Add a git alias:
 
 ```bash
-# Add a git alias for quick access
 git config --global alias.ai-commit "!git-copilot-commit commit"
+```
 
-# Now you can use:
+Now you can run:
+
+```bash
 git ai-commit
 git ai-commit --model claude-3.5-sonnet
 git ai-commit --all --verbose
 ```
 
-You can also configure git to show more context in diffs, which can help when reviewing changes:
+Show more context in diffs:
 
 ```bash
-# Show more context in diffs
 git config --global diff.context 3
 ```
