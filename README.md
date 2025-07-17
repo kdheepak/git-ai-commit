@@ -7,6 +7,8 @@ GitHub Copilot.
 
 - **AI-Generated Commit Messages**: Uses GitHub Copilot to analyze your staged changes and generate
   conventional commit messages
+- **Multiple AI Models**: Choose from GPT-4, Claude, Gemini, and other available models
+- **Configurable Defaults**: Set a default model to use across all commits
 - **Message Editing**: Edit generated messages using your git-configured editor or commit directly
 - **Conventional Commits**: Follows the [Conventional Commits](https://www.conventionalcommits.org/)
   specification
@@ -63,6 +65,7 @@ git-copilot-commit commit
 
 - `--all, -a`: Stage all files before committing
 - `--verbose, -v`: Show verbose output with file details
+- `--model, -m`: Specify which AI model to use for generating the commit message
 
 1. The tool analyzes your changes
 2. Prompts you to stage files (if needed)
@@ -88,6 +91,18 @@ List available AI models:
 git-copilot-commit models
 ```
 
+#### `config`
+
+Manage application configuration:
+
+```bash
+# Show current configuration
+git-copilot-commit config --show
+
+# Set a default model for all commits
+git-copilot-commit config --set-default-model gpt-4o
+```
+
 ### Examples
 
 **Commit all changes with staging prompts:**
@@ -100,6 +115,25 @@ git-copilot-commit commit --all
 
 ```bash
 git-copilot-commit commit --verbose
+```
+
+**Use a specific AI model:**
+
+```bash
+git-copilot-commit commit --model claude-3.5-sonnet
+```
+
+**Set up a default model and use it:**
+
+```bash
+# Set default model once
+git-copilot-commit config --set-default-model gpt-4o
+
+# Now all commits will use gpt-4o by default
+git-copilot-commit commit
+
+# Override with a different model when needed
+git-copilot-commit commit --model claude-3.5-sonnet
 ```
 
 ## Generated Commit Message Format
