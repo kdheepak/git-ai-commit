@@ -238,26 +238,6 @@ def commit(
                 console.print("[green]Staged untracked files.[/green]")
             else:
                 raise typer.Exit()
-        elif not status.has_staged_changes:
-            console.print("[yellow]No staged changes found.[/yellow]")
-
-            # Offer to stage files based on what's available
-            if status.has_untracked_files and status.has_unstaged_changes:
-                choice = console.input(
-                    "Stage [a]ll files, [m]odified only, [s]elect interactively, or [q]uit? "
-                ).lower()
-
-                if choice == "a":
-                    repo.stage_files()
-                    console.print("[green]Staged all files.[/green]")
-                elif choice == "m":
-                    repo.stage_modified()
-                    console.print("[green]Staged modified files.[/green]")
-                elif choice == "s":
-                    handle_interactive_staging(repo, status)
-                else:
-                    console.print("No files staged.")
-                    raise typer.Exit()
 
     # Refresh status after staging
     status = repo.get_status()
