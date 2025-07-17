@@ -12,7 +12,18 @@ from pycopilot.auth import Authentication
 from .git import GitRepository, GitError, NotAGitRepositoryError, GitStatus
 
 console = Console()
-app = typer.Typer()
+app = typer.Typer(help=__doc__, add_completion=False)
+
+
+@app.callback(invoke_without_command=True)
+def main(ctx: typer.Context):
+    """
+    Automatically commit changes in the current git repository.
+    """
+    if ctx.invoked_subcommand is None:
+        # Show help when no command is provided
+        print(ctx.get_help())
+        raise typer.Exit()
 
 
 def display_file_status(status: GitStatus) -> None:
