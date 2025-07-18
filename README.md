@@ -88,7 +88,7 @@ Options:
 $ uvx git-copilot-commit models --help
 Usage: git-copilot-commit models [OPTIONS]
 
-  List models available for chat in a Rich table.
+  List models available for chat in a table.
 
 Options:
   --help  Show this message and exit.
