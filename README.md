@@ -176,8 +176,8 @@ Now you can run:
 
 ```bash
 git ai-commit
-git ai-commit --model claude-3.5-sonnet
 git ai-commit --all --verbose
+git ai-commit --model claude-3.5-sonnet
 ```
 
 Additionally, show more context in diffs by running the following command:
