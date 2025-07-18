@@ -156,13 +156,6 @@ Follows [Conventional Commits](https://www.conventionalcommits.org/):
 - `chore`: Maintenance
 - `revert`: Revert changes
 
-**Examples:**
-
-- `feat(auth): add JWT authentication`
-- `fix(db): retry connection on failure`
-- `docs(readme): update install steps`
-- `refactor(utils): simplify date parsing`
-
 ## Git Configuration
 
 Add a git alias by adding the following to your `~/.gitconfig`:
