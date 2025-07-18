@@ -58,39 +58,54 @@ git-copilot-commit commit
 ### Commit changes
 
 ```bash
-git-copilot-commit commit
+$ uvx git-copilot-commit commit --help
+Usage: git-copilot-commit commit [OPTIONS]
+
+  Automatically commit changes in the current git repository.
+
+Options:
+  -a, --all         Stage all files before committing
+  -v, --verbose     Show verbose output
+  -m, --model TEXT  Model to use for generating commit message
+  --help            Show this message and exit.
 ```
-
-**Options:**
-
-- `--all, -a`: Stage all files
-- `--verbose, -v`: Show detailed output
-- `--model, -m`: Choose an AI model
-
-Workflow:
-
-1. Analyze changes
-2. Prompt to stage files
-3. Generate a commit message
-4. Choose to commit, edit, or cancel
 
 ### Authenticate
 
 ```bash
-git-copilot-commit authenticate
+$ uvx git-copilot-commit authenticate --help
+Usage: git-copilot-commit authenticate [OPTIONS]
+
+  Autheticate with GitHub Copilot.
+
+Options:
+  --help  Show this message and exit.
 ```
 
 ### List models
 
 ```bash
-git-copilot-commit models
+$ uvx git-copilot-commit models --help
+Usage: git-copilot-commit models [OPTIONS]
+
+  List models available for chat in a Rich table.
+
+Options:
+  --help  Show this message and exit.
 ```
 
 ### Configure
 
 ```bash
-git-copilot-commit config --show
-git-copilot-commit config --set-default-model gpt-4o
+$ uvx git-copilot-commit config --help
+Usage: git-copilot-commit config [OPTIONS]
+
+  Manage application configuration.
+
+Options:
+  --set-default-model TEXT  Set default model for commit messages
+  --show                    Show current configuration
+  --help                    Show this message and exit.
 ```
 
 ## Examples
