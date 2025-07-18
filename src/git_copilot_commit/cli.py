@@ -315,7 +315,7 @@ def authenticate():
 
 @app.command()
 def models():
-    """List models available for chat in a Rich table."""
+    """List models available for chat in a table."""
     models = Copilot().models
 
     console = Console()
