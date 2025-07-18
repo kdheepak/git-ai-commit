@@ -2,7 +2,7 @@
 
 AI-powered Git commit assistant that generates conventional commit messages using GitHub Copilot.
 
-![demo](https://github.com/user-attachments/assets/6a6d70a6-6060-44e6-8cf4-a6532e9e9142)
+![](https://github.com/user-attachments/assets/6a6d70a6-6060-44e6-8cf4-a6532e9e9142)
 
 ## Features
 
