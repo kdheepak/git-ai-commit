@@ -262,12 +262,12 @@ def commit(
 
     # Generate or use provided commit message
     with console.status(
-        "[cyan]Generating commit message based on [code] `git diff --staged` [/code]...[/cyan]"
+        "[cyan]Generating commit message based on [bold]`git diff --staged`[/bold]...[/cyan]"
     ):
         commit_message = generate_commit_message(repo, status, model)
 
     console.print(
-        "[cyan]Generated commit message based on [code] `git diff --staged` [/code]...[/cyan]"
+        "[cyan]Generated commit message based on [bold]`git diff --staged`[/bold]...[/cyan]"
     )
 
     # Display commit message
