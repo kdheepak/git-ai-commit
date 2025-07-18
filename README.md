@@ -180,7 +180,7 @@ git ai-commit --model claude-3.5-sonnet
 git ai-commit --all --verbose
 ```
 
-Show more context in diffs:
+Additionally, show more context in diffs by running the following command:
 
 ```bash
 git config --global diff.context 3
