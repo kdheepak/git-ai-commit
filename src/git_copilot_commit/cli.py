@@ -172,6 +172,7 @@ Return the commit message as the output without any additional text, explanation
     )
 
     prompt = f"""Recent commits:
+
 {recent_commits_text}
 
 `git status`:
