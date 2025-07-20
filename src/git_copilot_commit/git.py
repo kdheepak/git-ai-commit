@@ -1,7 +1,7 @@
 import subprocess
 from pathlib import Path
 from dataclasses import dataclass
-from typing import List, Tuple, Optional
+from typing import Tuple
 from enum import Enum
 
 
@@ -64,7 +64,7 @@ class GitFile:
 class GitStatus:
     """Structured representation of git status."""
 
-    files: List[GitFile]
+    files: list[GitFile]
     staged_diff: str
     unstaged_diff: str
 
@@ -84,17 +84,17 @@ class GitStatus:
         return any(f.is_untracked for f in self.files)
 
     @property
-    def staged_files(self) -> List[GitFile]:
+    def staged_files(self) -> list[GitFile]:
         """Get list of files with staged changes."""
         return [f for f in self.files if f.is_staged]
 
     @property
-    def unstaged_files(self) -> List[GitFile]:
+    def unstaged_files(self) -> list[GitFile]:
         """Get list of files with unstaged changes."""
         return [f for f in self.files if not f.is_staged and not f.is_untracked]
 
     @property
-    def untracked_files(self) -> List[GitFile]:
+    def untracked_files(self) -> list[GitFile]:
         """Get list of untracked files."""
         return [f for f in self.files if f.is_untracked]
 
@@ -109,7 +109,7 @@ class GitStatus:
 class GitRepository:
     """Encapsulates git repository operations."""
 
-    def __init__(self, repo_path: Optional[Path] = None, timeout: int = 30):
+    def __init__(self, repo_path: Path | None = None, timeout: int = 30):
         """
         Initialize GitRepository.
 
@@ -132,7 +132,7 @@ class GitRepository:
             raise NotAGitRepositoryError(f"{self.repo_path} is not a git repository")
 
     def _run_git_command(
-        self, args: List[str], check: bool = True
+        self, args: list[str], check: bool = True
     ) -> subprocess.CompletedProcess:
         """
         Run a git command and return the result.
@@ -188,7 +188,7 @@ class GitRepository:
             unstaged_diff=unstaged_diff_result.stdout,
         )
 
-    def _parse_status_output(self, status_output: str) -> List[GitFile]:
+    def _parse_status_output(self, status_output: str) -> list[GitFile]:
         """Parse git status --porcelain output into GitFile objects."""
         files = []
         for line in status_output.strip().split("\n"):
@@ -212,7 +212,7 @@ class GitRepository:
 
         return files
 
-    def stage_files(self, paths: Optional[List[str]] = None) -> None:
+    def stage_files(self, paths: list[str] | None = None) -> None:
         """
         Stage files for commit.
 
@@ -232,7 +232,7 @@ class GitRepository:
         """Stage all modified files (git add -u)."""
         self._run_git_command(["add", "-u"])
 
-    def unstage_files(self, paths: Optional[List[str]] = None) -> None:
+    def unstage_files(self, paths: list[str] | None = None) -> None:
         """
         Unstage files.
 
@@ -244,7 +244,7 @@ class GitRepository:
         else:
             self._run_git_command(["reset", "HEAD"] + paths)
 
-    def commit(self, message: Optional[str] = None, use_editor: bool = False) -> str:
+    def commit(self, message: str | None = None, use_editor: bool = False) -> str:
         """
         Create a commit with the given message or using git's editor.
 
@@ -261,16 +261,18 @@ class GitRepository:
         if use_editor:
             import tempfile
             import os
-            
+
             # Create temp file with message as starting point
-            with tempfile.NamedTemporaryFile(mode='w', suffix='.txt', delete=False) as f:
+            with tempfile.NamedTemporaryFile(
+                mode="w", suffix=".txt", delete=False
+            ) as f:
                 if message:
                     f.write(message)
                 temp_file = f.name
-            
+
             try:
                 args = ["commit", "-e", "-F", temp_file]
-                
+
                 # Run interactively without capturing output
                 cmd = ["git"] + args
                 subprocess.run(
@@ -297,7 +299,7 @@ class GitRepository:
         sha_result = self._run_git_command(["rev-parse", "HEAD"])
         return sha_result.stdout.strip()
 
-    def get_recent_commits(self, limit: int = 10) -> List[Tuple[str, str]]:
+    def get_recent_commits(self, limit: int = 10) -> list[Tuple[str, str]]:
         """
         Get recent commit history.
 
@@ -333,7 +335,7 @@ class GitRepository:
             or status.has_untracked_files
         )
 
-    def get_diff(self, staged: bool = False, paths: Optional[List[str]] = None) -> str:
+    def get_diff(self, staged: bool = False, paths: list[str] | None = None) -> str:
         """
         Get diff output.
 
