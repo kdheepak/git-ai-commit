@@ -2,7 +2,6 @@ import subprocess
 from pathlib import Path
 from dataclasses import dataclass
 from typing import Tuple
-from enum import Enum
 
 
 class GitError(Exception):
@@ -21,19 +20,6 @@ class GitCommandError(GitError):
     """Raised when a git command fails."""
 
     pass
-
-
-class FileStatus(Enum):
-    """Git file status codes."""
-
-    MODIFIED = "M"
-    ADDED = "A"
-    DELETED = "D"
-    RENAMED = "R"
-    COPIED = "C"
-    UNMERGED = "U"
-    UNTRACKED = "?"
-    IGNORED = "!"
 
 
 @dataclass
