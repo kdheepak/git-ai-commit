@@ -9,7 +9,7 @@ from rich.panel import Panel
 from rich.table import Table
 import rich
 
-from pycopilot.copilot import Copilot
+from pycopilot.copilot import Copilot  # type: ignore
 from pycopilot.auth import Authentication
 from .git import GitRepository, GitError, NotAGitRepositoryError, GitStatus
 from .settings import Settings
