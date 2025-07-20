@@ -161,7 +161,7 @@ git-copilot-commit commit --model claude-3.5-sonnet
 
 Follows [Conventional Commits](https://www.conventionalcommits.org/):
 
-```
+```plaintext
 <type>[optional scope]: <description>
 ```
 
