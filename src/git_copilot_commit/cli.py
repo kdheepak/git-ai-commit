@@ -170,7 +170,6 @@ def commit(
     all_files: bool = typer.Option(
         False, "--all", "-a", help="Stage all files before committing"
     ),
-    verbose: bool = typer.Option(False, "--verbose", "-v", help="Show verbose output"),
     model: str | None = typer.Option(
         None, "--model", "-m", help="Model to use for generating commit message"
     ),
@@ -243,12 +242,6 @@ def commit(
 
     # Display commit message
     console.print(Panel(commit_message, title="Commit Message", border_style="green"))
-
-    # Show what will be committed in verbose mode
-    if verbose:
-        console.print("\n[bold]Changes to be committed:[/bold]")
-        for file in status.staged_files:
-            console.print(f"  {file.staged_status} {file.path}")
 
     # Confirm commit or edit message (skip if --yes flag is used)
     if yes:

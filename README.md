@@ -87,7 +87,6 @@ Usage: git-copilot-commit commit [OPTIONS]
 
 Options:
   -a, --all         Stage all files before committing
-  -v, --verbose     Show verbose output
   -m, --model TEXT  Model to use for generating commit message
   -y, --yes         Automatically accept the generated commit message
   --help            Show this message and exit.
@@ -139,10 +138,10 @@ Commit all changes:
 git-copilot-commit commit --all
 ```
 
-Verbose output:
+Accept the generated commit message without editing:
 
 ```bash
-git-copilot-commit commit --verbose
+git-copilot-commit commit --yes
 ```
 
 Use a specific model:
@@ -192,8 +191,7 @@ Now you can run:
 
 ```bash
 git ai-commit
-git ai-commit --all --verbose
-git ai-commit --model claude-3.5-sonnet
+git ai-commit --all --yes --model claude-3.5-sonnet
 ```
 
 Additionally, show more context in diffs by running the following command:
