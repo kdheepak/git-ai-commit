@@ -71,12 +71,8 @@ pipx install git-copilot-commit
 
    ```bash
    git-copilot-commit commit
-   ```
-
-4. Or, if you want to stage all files before committing use:
-
-   ```bash
-   git-copilot-commit commit --all
+   # Or, if you want to stage all files and accept the generated commit message, use:
+   git-copilot-commit commit --all --yes
    ```
 
 ## Usage
@@ -93,6 +89,7 @@ Options:
   -a, --all         Stage all files before committing
   -v, --verbose     Show verbose output
   -m, --model TEXT  Model to use for generating commit message
+  -y, --yes         Automatically accept the generated commit message
   --help            Show this message and exit.
 ```
 

@@ -206,9 +206,12 @@ def commit(
     model: str | None = typer.Option(
         None, "--model", "-m", help="Model to use for generating commit message"
     ),
+    yes: bool = typer.Option(
+        False, "--yes", "-y", help="Automatically accept the generated commit message"
+    ),
 ):
     """
-    Automatically commit changes in the current git repository.
+    Generate commit message based on changes in the current git repository and commit them.
     """
     try:
         repo = GitRepository()
@@ -283,34 +286,42 @@ def commit(
         for file in status.staged_files:
             console.print(f"  {file.staged_status} {file.path}")
 
-    # Confirm commit or edit message
-    choice = typer.prompt(
-        "Choose action: (c)ommit, (e)dit message, (q)uit",
-        default="c",
-        show_default=True,
-    ).lower()
-
-    if choice == "q":
-        console.print("Commit cancelled.")
-        raise typer.Exit()
-    elif choice == "e":
-        # Use git's built-in editor with generated message as template
-        console.print("[cyan]Opening git editor...[/cyan]")
-        try:
-            commit_sha = repo.commit(commit_message, use_editor=True)
-        except GitError as e:
-            console.print(f"[red]Commit failed: {e}[/red]")
-            raise typer.Exit(1)
-    elif choice == "c":
-        # Commit with generated message
+    # Confirm commit or edit message (skip if --yes flag is used)
+    if yes:
+        # Automatically commit with generated message
         try:
             commit_sha = repo.commit(commit_message)
         except GitError as e:
             console.print(f"[red]Commit failed: {e}[/red]")
             raise typer.Exit(1)
     else:
-        console.print("Invalid choice. Commit cancelled.")
-        raise typer.Exit()
+        choice = typer.prompt(
+            "Choose action: (c)ommit, (e)dit message, (q)uit",
+            default="c",
+            show_default=True,
+        ).lower()
+
+        if choice == "q":
+            console.print("Commit cancelled.")
+            raise typer.Exit()
+        elif choice == "e":
+            # Use git's built-in editor with generated message as template
+            console.print("[cyan]Opening git editor...[/cyan]")
+            try:
+                commit_sha = repo.commit(commit_message, use_editor=True)
+            except GitError as e:
+                console.print(f"[red]Commit failed: {e}[/red]")
+                raise typer.Exit(1)
+        elif choice == "c":
+            # Commit with generated message
+            try:
+                commit_sha = repo.commit(commit_message)
+            except GitError as e:
+                console.print(f"[red]Commit failed: {e}[/red]")
+                raise typer.Exit(1)
+        else:
+            console.print("Invalid choice. Commit cancelled.")
+            raise typer.Exit()
 
     # Show success message
     console.print(f"[green]✓ Successfully committed: {commit_sha[:8]}[/green]")
