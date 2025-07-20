@@ -21,7 +21,7 @@ app = typer.Typer(help=__doc__, add_completion=False)
 
 def version_callback(value: bool):
     if value:
-        rich.print(f"git-copilot-version [bold green]{__version__}[/]")
+        rich.print(f"git-copilot-commit [bold green]{__version__}[/]")
         raise typer.Exit()
 
 
