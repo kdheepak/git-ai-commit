@@ -32,12 +32,10 @@ Then install `git-copilot-commit`:
 uv tool install git-copilot-commit
 ```
 
-### Run without installation
-
-You can run the latest version with [`uv`] using the following command:
+Alternatively, you can run the latest version of tool directly without installing it by using:
 
 ```bash
-uvx git-copilot-commit --help
+uvx git-copilot-commit
 ```
 
 [`uv`]: https://github.com/astral-sh/uv
@@ -185,7 +183,7 @@ Add a git alias by adding the following to your `~/.gitconfig`:
 
 ```ini
 [alias]
-    ai-commit = "!f() { git-copilot-commit commit $@; }; f"
+    ai-commit = "!f() { uvx git-copilot-commit commit $@; }; f"
 ```
 
 Now you can run:
