@@ -203,16 +203,12 @@ class GitRepository:
         Stage files for commit.
 
         Args:
-            paths: List of file paths to stage. If None, stages all files (git add .).
+          paths: List of file paths to stage. If None, stages all files (git add .).
         """
         if paths is None:
             self._run_git_command(["add", "."])
         else:
-            # Stage files in batches to avoid command line length limits
-            batch_size = 100
-            for i in range(0, len(paths), batch_size):
-                batch = paths[i : i + batch_size]
-                self._run_git_command(["add"] + batch)
+            self._run_git_command(["add"] + paths)
 
     def stage_modified(self) -> None:
         """Stage all modified files (git add -u)."""
