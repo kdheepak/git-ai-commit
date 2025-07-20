@@ -41,38 +41,6 @@ def main(
         raise typer.Exit()
 
 
-def display_file_status(status: GitStatus) -> None:
-    """Display file status in a rich table."""
-    if not status.files:
-        return
-
-    table = Table(title="Git Status")
-    table.add_column("Status", style="yellow", width=8)
-    table.add_column("File", style="white")
-
-    # Group files by status
-    staged = status.staged_files
-    unstaged = status.unstaged_files
-    untracked = status.untracked_files
-
-    if staged:
-        table.add_row("[green]Staged[/green]", "", style="dim")
-        for file in staged:
-            table.add_row(f"  {file.staged_status}", file.path)
-
-    if unstaged:
-        table.add_row("[yellow]Unstaged[/yellow]", "", style="dim")
-        for file in unstaged:
-            table.add_row(f"  {file.status}", file.path)
-
-    if untracked:
-        table.add_row("[red]Untracked[/red]", "", style="dim")
-        for file in untracked:
-            table.add_row("  ?", file.path)
-
-    console.print(table)
-
-
 def generate_commit_message(
     repo: GitRepository, status: GitStatus, model: str | None = None
 ) -> str:
@@ -230,10 +198,6 @@ def commit(
     if not status.files:
         console.print("[yellow]No changes to commit.[/yellow]")
         raise typer.Exit()
-
-    # Display current status
-    if verbose:
-        display_file_status(status)
 
     # Handle staging based on options
     if all_files:
