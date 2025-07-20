@@ -25,24 +25,21 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-Then install `git-copilot-commit`:
+Then install and run `git-copilot-commit`:
 
 ```bash
-# Install into isolated environment.
+# Install into global isolated environment
 uv tool install git-copilot-commit
-```
 
-Run the tool using:
-
-```bash
+# Run --help to see available commands
 git-copilot-commit --help
 ```
 
-Alternatively, you can always install and run the latest version of tool directly in one command by
-using:
+Alternatively, you can install and run the latest version of tool directly every time by invoking
+this one command:
 
 ```bash
-# Install latest version into temporary environment and run
+# Install latest version into temporary environment and run --help
 uvx git-copilot-commit --help
 ```
 
