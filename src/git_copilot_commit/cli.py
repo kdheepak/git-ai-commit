@@ -78,9 +78,13 @@ def generate_commit_message(
 ) -> str:
     """Generate a conventional commit message using Copilot API."""
 
-    # Get recent commits for context
-    recent_commits = repo.get_recent_commits(limit=5)
-    recent_commits_text = "\n".join([f"- {msg}" for _, msg in recent_commits])
+    # Get recent commits for context (handle empty repositories)
+    try:
+        recent_commits = repo.get_recent_commits(limit=5)
+        recent_commits_text = "\n".join([f"- {msg}" for _, msg in recent_commits])
+    except GitError:
+        # No commits yet in this repository
+        recent_commits_text = "No previous commits (initial commit)"
 
     client = Copilot(
         system_prompt="""
