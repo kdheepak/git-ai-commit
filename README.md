@@ -38,7 +38,8 @@ Run the tool using:
 git-copilot-commit --help
 ```
 
-Alternatively, you can run the latest version of tool directly without installing it by using:
+Alternatively, you can always install and run the latest version of tool directly in one command by
+using:
 
 ```bash
 # Install latest version into temporary environment and run
