@@ -13,25 +13,42 @@ AI-powered Git commit assistant that generates conventional commit messages usin
 
 ## Installation
 
-Install with [`uv`] (recommended):
+### Install the tool using [`uv`] (recommended)
+
+Install [`uv`]:
 
 ```bash
+# On macOS and Linux.
+curl -LsSf https://astral.sh/uv/install.sh | sh
+
+# On Windows.
+powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
+```
+
+Then install `git-copilot-commit`:
+
+```bash
+# Install into isolated environment.
 uv tool install git-copilot-commit
 ```
 
-Or with `pipx`:
+### Run without installation
 
-```bash
-pipx install git-copilot-commit
-```
-
-Or run directly with [`uv`]:
+You can run the latest version with [`uv`] using the following command:
 
 ```bash
 uvx git-copilot-commit --help
 ```
 
 [`uv`]: https://github.com/astral-sh/uv
+
+### Install with `pipx`
+
+If you prefer to use `pipx`:
+
+```bash
+pipx install git-copilot-commit
+```
 
 ## Prerequisites
 
@@ -41,17 +58,23 @@ uvx git-copilot-commit --help
 
 1. Authenticate with GitHub Copilot:
 
-```bash
-git-copilot-commit authenticate
-```
+   ```bash
+   git-copilot-commit authenticate
+   ```
 
 2. Make changes in your repository.
 
 3. Generate and commit:
 
-```bash
-git-copilot-commit commit
-```
+   ```bash
+   git-copilot-commit commit
+   ```
+
+4. Or, if you want to stage all files before committing use:
+
+   ```bash
+   git-copilot-commit commit --all
+   ```
 
 ## Usage
 
