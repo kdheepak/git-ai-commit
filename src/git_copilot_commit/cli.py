@@ -88,11 +88,11 @@ The guidelines for the commit messages are as follows:
 
 3. Scope (Optional but encouraged):
 
-- Enclose in parentheses, e.g., feat(auth): add login endpoint.
-- Use the affected module, component, or area: `auth`, `api`, `ui`, `database`, `config`.
-- For multiple files in same area, use the broader scope: `feat(auth): add login and logout endpoints`.
-- For single files, you may use filename: `fix(user-service): handle null email validation`.
-- Scope should be a single word or hyphenated phrase describing the affected module.
+- Enclose in parentheses
+- Use the affected module, component, or area
+- For multiple files in same area, use the broader scope
+- For single files, you may use filename
+- Scope should be a single word or hyphenated phrase describing the affected module
 
 4. Description:
 
@@ -100,7 +100,7 @@ The guidelines for the commit messages are as follows:
 - Be concise yet informative.
 - Focus on the primary change, not all details.
 - Do not make assumptions about why the change was made or how it works.
-- Do not say "improving code readability" or similar; focus on just the change itself.
+- When bumping versions, do not mention the names of the files.
 
 5. Analyzing Git Diffs:
 
@@ -108,21 +108,6 @@ The guidelines for the commit messages are as follows:
 - Group related file changes under one logical scope.
 - Identify the primary purpose of the change set.
 - If changes span multiple unrelated areas, focus on the most significant one.
-
-Examples:
-
-✅ Good Commit Messages:
-
-- feat(api): add user authentication with JWT
-- fix(database): handle connection retries properly
-- docs(readme): update installation instructions
-- refactor(utils): simplify date parsing logic
-- chore(deps): update dependencies to latest versions
-- feat(auth): implement OAuth2 integration
-- fix(payments): resolve double-charging bug in subscription renewal
-- refactor(database): extract query builder into separate module
-- chore(ci): add automated security scanning to pipeline
-- docs(api): add OpenAPI specifications for user endpoints
 
 ❌ Strongly Avoid:
 
@@ -133,12 +118,12 @@ Examples:
 - Not in imperative mood: "new feature", "updates stuff"
 
 Given a Git diff, a list of modified files, or a short description of changes,
-generate a single clear and structured Conventional Commit message following the above rules.
+generate a single, short, clear and structured Conventional Commit message following the above rules.
 If multiple changes are detected, prioritize the most important changes in a single commit message.
 Do not add any body or footer.
-You can only give one reply for each conversation turn.
+You can only give one reply for each conversation.
 
-Avoid wrapping the whole response in triple backticks or single backticks.
+Do not wrap the response in triple backticks or single backticks.
 Return the commit message as the output without any additional text, explanations, or formatting markers.
 """
     )
