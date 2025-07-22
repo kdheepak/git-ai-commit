@@ -42,18 +42,39 @@ def main(
         raise typer.Exit()
 
 
+def get_prompt_locations():
+    """Get potential prompt file locations in order of preference."""
+    import importlib.resources
+    
+    filename = "commit-message-generator-prompt.md"
+    
+    return [
+        Path(Settings().data_dir) / "prompts" / filename,  # User customizable
+        importlib.resources.files("git_copilot_commit") / "prompts" / filename  # Packaged version
+    ]
+
+
+def get_active_prompt_path():
+    """Get the path of the prompt file that will be used."""
+    for path in get_prompt_locations():
+        try:
+            path.read_text(encoding="utf-8")
+            return str(path)
+        except (FileNotFoundError, AttributeError):
+            continue
+    return None
+
+
 def load_system_prompt() -> str:
     """Load the system prompt from the markdown file."""
-    try:
-        import importlib.resources
-
-        prompts_dir = importlib.resources.files("git_copilot_commit") / "prompts"
-        prompt_path = prompts_dir / "commit-message-generator-prompt.md"
-        print(f"Loading system prompt from {prompt_path}")
-        return prompt_path.read_text(encoding="utf-8")
-    except (ImportError, FileNotFoundError):
-        console.print("[red]Error: Prompt file not found[/red]")
-        raise typer.Exit(1)
+    for path in get_prompt_locations():
+        try:
+            return path.read_text(encoding="utf-8")
+        except (FileNotFoundError, AttributeError):
+            continue
+    
+    console.print("[red]Error: Prompt file not found in any location[/red]")
+    raise typer.Exit(1)
 
 
 def generate_commit_message(
@@ -275,6 +296,12 @@ def config(
             console.print(f"Default model: [cyan]{default_model}[/cyan]")
         else:
             console.print("Default model: [dim]not set[/dim]")
+
+        active_prompt = get_active_prompt_path()
+        if active_prompt:
+            console.print(f"Active prompt file: [cyan]{active_prompt}[/cyan]")
+        else:
+            console.print("Active prompt file: [red]not found[/red]")
 
         console.print(f"Config file: [dim]{settings.config_file}[/dim]")
 
