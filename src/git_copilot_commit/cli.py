@@ -2,6 +2,7 @@
 git-copilot-commit - AI-powered Git commit assistant
 """
 
+import rich.terminal_theme
 import typer
 from rich.console import Console
 from rich.prompt import Confirm
@@ -40,6 +41,8 @@ def main(
         # Show help when no command is provided
         print(ctx.get_help())
         raise typer.Exit()
+    else:
+        console.print(f"[bold]git-copilot-commit[/] - [bold blue]v{__version__}[/]\n")
 
 
 def get_prompt_locations():
@@ -138,8 +141,6 @@ def commit(
     """
     Generate commit message based on changes in the current git repository and commit them.
     """
-    console.print("[bold]git-copilot-commit[/bold] - AI-powered Git commit assistant")
-    console.print(f"Version: [bold green]{__version__}[/bold green]")
     try:
         repo = GitRepository()
     except NotAGitRepositoryError:
