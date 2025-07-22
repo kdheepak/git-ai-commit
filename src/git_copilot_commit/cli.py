@@ -10,7 +10,7 @@ from rich.table import Table
 import rich
 from pathlib import Path
 
-from pycopilot.copilot import Copilot, CopilotApiError  # type: ignore
+from pycopilot.copilot import Copilot, CopilotAPIError  # type: ignore
 from pycopilot.auth import Authentication
 from .git import GitRepository, GitError, NotAGitRepositoryError, GitStatus
 from .settings import Settings
@@ -105,7 +105,7 @@ Generate a conventional commit message:"""
     try:
         response = client.ask(prompt, model=model) if model else client.ask(prompt)
         return response.content
-    except CopilotApiError:
+    except CopilotAPIError:
         # Fallback to git status only when diff is too large
         fallback_prompt = f"""`git status`:
 

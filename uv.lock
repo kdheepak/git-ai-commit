@@ -68,7 +68,7 @@ dependencies = [
 [package.metadata]
 requires-dist = [
     { name = "platformdirs", specifier = ">=4.0.0" },
-    { name = "pycopilot", specifier = ">=0.1.6" },
+    { name = "pycopilot", specifier = ">=0.1.7" },
     { name = "rich", specifier = ">=14.0.0" },
     { name = "typer", specifier = ">=0.16.0" },
 ]
@@ -163,7 +163,7 @@ wheels = [
 
 [[package]]
 name = "pycopilot"
-version = "0.1.6"
+version = "0.1.7"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "httpx" },
@@ -174,9 +174,9 @@ dependencies = [
     { name = "rich" },
     { name = "typer" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/45/ae/9d540cfe9411ad9f5ab58080aab86a5a7902ab668ad16fb637f287c88ba7/pycopilot-0.1.6.tar.gz", hash = "sha256:84425265e0d587d964e7b5dd93de9d9175b849b7d718107a48efb749e5b88e8e", size = 31667, upload-time = "2025-07-17T15:39:42.473Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/41/c9/666fe6cefc806e363674b619c3d79575f3966474a77b828af2f9a725d7c8/pycopilot-0.1.7.tar.gz", hash = "sha256:82e295ef7fa6e9d626d12183adc8786ee6baa30f77e582d6a2f712cd88b69193", size = 31866, upload-time = "2025-07-22T12:25:14.553Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/3e/5f/56cd35579f5d400b2ef9f0c62b41f6024936fbfc8f69e302036588052531/pycopilot-0.1.6-py3-none-any.whl", hash = "sha256:88f39535a87d1efdc2358357d956bbe0d9e6b5a6fd60d572d46c813fe23af2d0", size = 10811, upload-time = "2025-07-17T15:39:41.608Z" },
+    { url = "https://files.pythonhosted.org/packages/1a/fb/401f2395f2051c2e1d0b997a5ad355310ecdfdc68b06718554971280b18d/pycopilot-0.1.7-py3-none-any.whl", hash = "sha256:9fced5efcfab9d0b91d2d542e4949e17f32f395f27b529882af0200908cfb9cc", size = 10930, upload-time = "2025-07-22T12:25:13.513Z" },
 ]
 
 [[package]]
