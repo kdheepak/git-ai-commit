@@ -138,6 +138,8 @@ def commit(
     """
     Generate commit message based on changes in the current git repository and commit them.
     """
+    console.print("[bold]git-copilot-commit[/bold] - AI-powered Git commit assistant")
+    console.print(f"Version: [bold green]{__version__}[/bold green]")
     try:
         repo = GitRepository()
     except NotAGitRepositoryError:
