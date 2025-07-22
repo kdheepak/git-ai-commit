@@ -24,6 +24,12 @@ build-backend = "hatchling.build"
 [tool.hatch.version]
 source = "versioningit"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/git_copilot_commit"]
+
+[tool.hatch.build.targets.wheel.shared-data]
+"prompts" = "prompts"
+
 [tool.versioningit.next-version]
 method = "smallest"
 
