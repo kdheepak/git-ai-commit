@@ -25,7 +25,14 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"
 ```
 
-Then install and run `git-copilot-commit`:
+You can install and run the latest version of tool directly every time by invoking this one command:
+
+```bash
+# Install latest version into temporary environment and run --help
+uvx git-copilot-commit --help
+```
+
+Alternatively, you can install into a global isolated environment and run `git-copilot-commit`:
 
 ```bash
 # Install into global isolated environment
@@ -33,14 +40,6 @@ uv tool install git-copilot-commit
 
 # Run --help to see available commands
 git-copilot-commit --help
-```
-
-Alternatively, you can install and run the latest version of tool directly every time by invoking
-this one command:
-
-```bash
-# Install latest version into temporary environment and run --help
-uvx git-copilot-commit --help
 ```
 
 [`uv`]: https://github.com/astral-sh/uv
@@ -62,7 +61,7 @@ pipx install git-copilot-commit
 1. Authenticate with GitHub Copilot:
 
    ```bash
-   git-copilot-commit authenticate
+   uvx git-copilot-commit authenticate
    ```
 
 2. Make changes in your repository.
@@ -70,9 +69,9 @@ pipx install git-copilot-commit
 3. Generate and commit:
 
    ```bash
-   git-copilot-commit commit
+   uvx git-copilot-commit commit
    # Or, if you want to stage all files and accept the generated commit message, use:
-   git-copilot-commit commit --all --yes
+   uvx git-copilot-commit commit --all --yes
    ```
 
 ## Usage
@@ -135,27 +134,27 @@ Options:
 Commit all changes:
 
 ```bash
-git-copilot-commit commit --all
+uvx git-copilot-commit commit --all
 ```
 
 Accept the generated commit message without editing:
 
 ```bash
-git-copilot-commit commit --yes
+uvx git-copilot-commit commit --yes
 ```
 
 Use a specific model:
 
 ```bash
-git-copilot-commit commit --model claude-3.5-sonnet
+uvx git-copilot-commit commit --model claude-3.5-sonnet
 ```
 
 Set and use a default model:
 
 ```bash
-git-copilot-commit config --set-default-model gpt-4o
-git-copilot-commit commit
-git-copilot-commit commit --model claude-3.5-sonnet
+uvx git-copilot-commit config --set-default-model gpt-4o
+uvx git-copilot-commit commit
+uvx git-copilot-commit commit --model claude-3.5-sonnet
 ```
 
 ## Commit Message Format
