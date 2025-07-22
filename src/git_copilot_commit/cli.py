@@ -10,7 +10,7 @@ from rich.table import Table
 import rich
 from pathlib import Path
 
-from pycopilot.copilot import Copilot  # type: ignore
+from pycopilot.copilot import Copilot, CopilotApiError  # type: ignore
 from pycopilot.auth import Authentication
 from .git import GitRepository, GitError, NotAGitRepositoryError, GitStatus
 from .settings import Settings
@@ -45,12 +45,14 @@ def main(
 def get_prompt_locations():
     """Get potential prompt file locations in order of preference."""
     import importlib.resources
-    
+
     filename = "commit-message-generator-prompt.md"
-    
+
     return [
         Path(Settings().data_dir) / "prompts" / filename,  # User customizable
-        importlib.resources.files("git_copilot_commit") / "prompts" / filename  # Packaged version
+        importlib.resources.files("git_copilot_commit")
+        / "prompts"
+        / filename,  # Packaged version
     ]
 
 
@@ -72,7 +74,7 @@ def load_system_prompt() -> str:
             return path.read_text(encoding="utf-8")
         except (FileNotFoundError, AttributeError):
             continue
-    
+
     console.print("[red]Error: Prompt file not found in any location[/red]")
     raise typer.Exit(1)
 
@@ -82,21 +84,10 @@ def generate_commit_message(
 ) -> str:
     """Generate a conventional commit message using Copilot API."""
 
-    # Get recent commits for context (handle empty repositories)
-    try:
-        recent_commits = repo.get_recent_commits(limit=5)
-        recent_commits_text = "\n".join([f"- {msg}" for _, msg in recent_commits])
-    except GitError:
-        # No commits yet in this repository
-        recent_commits_text = "No previous commits (initial commit)"
-
     system_prompt = load_system_prompt()
     client = Copilot(system_prompt=system_prompt)
 
-    prompt = f"""Recent commits:
-
-{recent_commits_text}
-
+    prompt = f"""
 `git status`:
 
 ```
@@ -111,8 +102,25 @@ def generate_commit_message(
 
 Generate a conventional commit message:"""
 
-    response = client.ask(prompt, model=model) if model else client.ask(prompt)
-    return response.content
+    try:
+        response = client.ask(prompt, model=model) if model else client.ask(prompt)
+        return response.content
+    except CopilotApiError:
+        # Fallback to git status only when diff is too large
+        fallback_prompt = f"""`git status`:
+
+```
+{status.get_porcelain_output()}
+```
+
+Generate a conventional commit message based on the git status above:"""
+
+        response = (
+            client.ask(fallback_prompt, model=model)
+            if model
+            else client.ask(fallback_prompt)
+        )
+        return response.content
 
 
 @app.command()
