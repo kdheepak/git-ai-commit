@@ -42,7 +42,9 @@ def main(
         print(ctx.get_help())
         raise typer.Exit()
     else:
-        console.print(f"[bold]git-copilot-commit[/] - [bold blue]v{__version__}[/]\n")
+        console.print(
+            f"[bold]{(__package__ or 'git_copilot_commit').replace('_', '-')}[/] - [bold blue]v{__version__}[/]\n"
+        )
 
 
 def get_prompt_locations():
