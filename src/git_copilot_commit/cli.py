@@ -48,7 +48,7 @@ def load_system_prompt() -> str:
         import importlib.resources
 
         prompts_dir = importlib.resources.files("git_copilot_commit") / "prompts"
-        prompt_path = prompts_dir / "commit_message_generator.md"
+        prompt_path = prompts_dir / "commit-message-generator-prompt.md"
         print(f"Loading system prompt from {prompt_path}")
         return prompt_path.read_text(encoding="utf-8")
     except (ImportError, FileNotFoundError):
