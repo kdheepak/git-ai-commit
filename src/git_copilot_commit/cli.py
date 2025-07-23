@@ -3,6 +3,7 @@ git-copilot-commit - AI-powered Git commit assistant
 """
 
 import rich.terminal_theme
+import sys
 import typer
 from rich.console import Console
 from rich.prompt import Confirm
@@ -39,12 +40,14 @@ def main(
     """
     if ctx.invoked_subcommand is None:
         # Show help when no command is provided
-        print(ctx.get_help())
+        console.print(ctx.get_help())
         raise typer.Exit()
     else:
-        console.print(
-            f"[bold]{(__package__ or 'git_copilot_commit').replace('_', '-')}[/] - [bold blue]v{__version__}[/]\n"
-        )
+        # Don't show version for print command to avoid interfering with pipes
+        if ctx.invoked_subcommand != "echo":
+            console.print(
+                f"[bold]{(__package__ or 'git_copilot_commit').replace('_', '-')}[/] - [bold blue]v{__version__}[/]\n"
+            )
 
 
 def get_prompt_locations():
@@ -317,6 +320,52 @@ def config(
             console.print("Active prompt file: [red]not found[/red]")
 
         console.print(f"Config file: [dim]{settings.config_file}[/dim]")
+
+
+@app.command()
+def echo(
+    model: str | None = typer.Option(
+        None, "--model", "-m", help="Model to use for generating commit message"
+    ),
+):
+    """
+    Generate commit message from stdin input (useful for pipes).
+    """
+    # Read from stdin
+    input_text = sys.stdin.read()
+
+    if not input_text.strip():
+        console.print("[red]Error: No input provided via stdin[/red]")
+        raise typer.Exit(1)
+
+    # Load settings and use default model if none provided
+    settings = Settings()
+    if model is None:
+        model = settings.default_model
+
+    # Load system prompt and create client
+    system_prompt = load_system_prompt()
+    client = Copilot(system_prompt=system_prompt)
+
+    # Generate commit message from the input
+    prompt = f"""
+git diff:
+
+```
+{input_text.strip()}
+```
+
+Generate a conventional commit message based on the input above:"""
+
+    try:
+        response = client.ask(prompt, model=model) if model else client.ask(prompt)
+        # Print the commit message directly to stdout (no rich formatting for pipes)
+        import builtins
+
+        builtins.print(response.content)
+    except CopilotAPIError as e:
+        console.print(f"[red]Error generating commit message: {e}[/red]")
+        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
