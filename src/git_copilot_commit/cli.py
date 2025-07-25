@@ -24,7 +24,7 @@ app = typer.Typer(help=__doc__, add_completion=False)
 
 def version_callback(value: bool):
     if value:
-        rich.print(f"git-copilot-commit [bold green]{__version__}[/]")
+        rich.print(f"git-copilot-commit [bold yellow]{__version__}[/]")
         raise typer.Exit()
 
 
@@ -46,7 +46,7 @@ def main(
         # Don't show version for print command to avoid interfering with pipes
         if ctx.invoked_subcommand != "echo":
             console.print(
-                f"[bold]{(__package__ or 'git_copilot_commit').replace('_', '-')}[/] - [bold blue]v{__version__}[/]\n"
+                f"[bold]{(__package__ or 'git_copilot_commit').replace('_', '-')}[/] - [bold green]v{__version__}[/]\n"
             )
 
 
@@ -193,21 +193,27 @@ def commit(
     status = repo.get_status()
 
     if not status.has_staged_changes:
-        console.print("[yellow]No staged changes to commit.[/yellow]")
+        console.print("[red]No staged changes to commit.[/red]")
         raise typer.Exit()
 
     # Generate or use provided commit message
     with console.status(
-        "[cyan]Generating commit message based on [bold]`git diff --staged`[/bold] ...[/cyan]"
+        "[yellow]Generating commit message based on [bold]`git diff --staged`[/] ...[/yellow]"
     ):
         commit_message = generate_commit_message(repo, status, model)
 
     console.print(
-        "[cyan]Generated commit message based on [bold]`git diff --staged`[/bold] ...[/cyan]"
+        "[yellow]Generated commit message based on [bold]`git diff --staged`[/] ...[/yellow]"
     )
 
     # Display commit message
-    console.print(Panel(commit_message, title="Commit Message", border_style="green"))
+    console.print(
+        Panel(
+            f"[bold]{commit_message}[/]",
+            title="Commit Message",
+            border_style="cyan",
+        )
+    )
 
     # Confirm commit or edit message (skip if --yes flag is used)
     if yes:
