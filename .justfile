@@ -1,5 +1,7 @@
-# Default recipe calls commit
-default: commit
+# List available commands
+[private]
+default:
+    @just --list
 
 # Pass all arguments directly to git-copilot-commit
 commit *args:
