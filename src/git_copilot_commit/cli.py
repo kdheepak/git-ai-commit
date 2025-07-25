@@ -14,7 +14,7 @@ from pathlib import Path
 
 from pycopilot.copilot import Copilot, CopilotAPIError  # type: ignore
 from pycopilot.auth import Authentication
-from .git import GitRepository, GitError, NotAGitRepositoryError, GitStatus
+from .git import GitRepository, GitError, NotAGitRepositoryError
 from .settings import Settings
 from .version import __version__
 
