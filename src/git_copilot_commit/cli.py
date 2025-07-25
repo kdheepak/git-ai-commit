@@ -355,7 +355,7 @@ def echo(
 
     # Generate commit message from the input
     prompt = f"""
-git diff:
+`git diff --staged`:
 
 ```
 {input_text.strip()}
