@@ -88,40 +88,53 @@ def load_system_prompt() -> str:
 
 
 def generate_commit_message(
-    repo: GitRepository, status: GitStatus, model: str | None = None
+    repo: GitRepository, model: str | None = None, context: str = ""
 ) -> str:
     """Generate a conventional commit message using Copilot API."""
+
+    # Refresh status after staging
+    status = repo.get_status()
+
+    if not status.has_staged_changes:
+        console.print("[red]No staged changes to commit.[/red]")
+        raise typer.Exit()
 
     system_prompt = load_system_prompt()
     client = Copilot(system_prompt=system_prompt)
 
-    prompt = f"""
-`git status`:
+    prompt_parts = [
+        "`git status`:\n",
+        f"```\n{status.get_porcelain_output()}\n```",
+        "\n\n`git diff --staged`:\n",
+        f"```\n{status.staged_diff}\n```",
+    ]
 
-```
-{status.get_porcelain_output()}
-```
+    if context.strip():
+        prompt_parts.insert(0, f"User-provided context:\n\n{context.strip()}\n\n")
 
-`git diff --staged`:
+    prompt_parts.append("\nGenerate a conventional commit message:")
 
-```
-{status.staged_diff}
-```
-
-Generate a conventional commit message:"""
+    prompt = "\n".join(prompt_parts)
 
     try:
         response = client.ask(prompt, model=model) if model else client.ask(prompt)
         return response.content
     except CopilotAPIError:
-        # Fallback to git status only when diff is too large
-        fallback_prompt = f"""`git status`:
+        fallback_prompt_parts = [
+            "`git status`:\n",
+            f"```\n{status.get_porcelain_output()}\n```",
+        ]
 
-```
-{status.get_porcelain_output()}
-```
+        if context.strip():
+            fallback_prompt_parts.insert(
+                0, f"User-provided context:\n\n{context.strip()}\n\n"
+            )
 
-Generate a conventional commit message based on the git status above:"""
+        fallback_prompt_parts.append(
+            "\nGenerate a conventional commit message based on the git status above:"
+        )
+
+        fallback_prompt = "\n".join(fallback_prompt_parts)
 
         response = (
             client.ask(fallback_prompt, model=model)
@@ -141,6 +154,12 @@ def commit(
     ),
     yes: bool = typer.Option(
         False, "--yes", "-y", help="Automatically accept the generated commit message"
+    ),
+    context: str = typer.Option(
+        "",
+        "--context",
+        "-c",
+        help="Optional user-provided context to guide commit message",
     ),
 ):
     """
@@ -189,18 +208,16 @@ def commit(
                 repo.stage_files()
                 console.print("[green]Staged untracked files.[/green]")
 
-    # Refresh status after staging
-    status = repo.get_status()
-
-    if not status.has_staged_changes:
-        console.print("[red]No staged changes to commit.[/red]")
-        raise typer.Exit()
+    if context:
+        console.print(
+            Panel(context.strip(), title="User Context", border_style="magenta")
+        )
 
     # Generate or use provided commit message
     with console.status(
         "[yellow]Generating commit message based on [bold]`git diff --staged`[/] ...[/yellow]"
     ):
-        commit_message = generate_commit_message(repo, status, model)
+        commit_message = generate_commit_message(repo, model, context=context)
 
     console.print(
         "[yellow]Generated commit message based on [bold]`git diff --staged`[/] ...[/yellow]"
