@@ -35,7 +35,7 @@ bump type="patch":
     #!/usr/bin/env bash
     set -euo pipefail
 
-    new_version=$(just next-version type={{type}})
+    new_version=$(just next-version {{type}})
     echo "New version: $new_version"
 
     git commit --allow-empty -m "Bump version to $new_version"
