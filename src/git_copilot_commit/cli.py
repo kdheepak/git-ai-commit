@@ -117,6 +117,7 @@ def generate_commit_message(
     prompt = "\n".join(prompt_parts)
 
     try:
+        client.reset()
         response = client.ask(prompt, model=model) if model else client.ask(prompt)
         return response.content
     except CopilotAPIError:
@@ -136,6 +137,7 @@ def generate_commit_message(
 
         fallback_prompt = "\n".join(fallback_prompt_parts)
 
+        client.reset()
         response = (
             client.ask(fallback_prompt, model=model)
             if model
