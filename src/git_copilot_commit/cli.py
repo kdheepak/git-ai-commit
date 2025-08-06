@@ -120,7 +120,7 @@ def generate_commit_message(
         client.reset()
         response = client.ask(prompt, model=model) if model else client.ask(prompt)
         return response.content
-    except CopilotAPIError:
+    except Exception as _:
         fallback_prompt_parts = [
             "`git status`:\n",
             f"```\n{status.get_porcelain_output()}\n```",
