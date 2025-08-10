@@ -3,12 +3,10 @@ git-copilot-commit - AI-powered Git commit assistant
 """
 
 import rich.terminal_theme
-import sys
 import typer
 from rich.console import Console
 from rich.prompt import Confirm
 from rich.panel import Panel
-from rich.table import Table
 import rich
 from pathlib import Path
 
