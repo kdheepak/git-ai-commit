@@ -49,6 +49,8 @@ release version:
     #!/usr/bin/env bash
     set -euo pipefail
 
+    version="{{version}}"
+
     echo "Pushing commit and tag for $version..."
     git push
     git push origin "$version"
