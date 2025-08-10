@@ -45,11 +45,19 @@ bump type="patch":
     echo "  Run: just release version=$new_version"
 
 # Push commit, tag, and create GitHub release
-release version:
+release version='':
     #!/usr/bin/env bash
     set -euo pipefail
 
-    version="{{version}}"
+    # If version wasn't passed positionally, check for named var
+    if [ -z "$version" ]; then
+        version="{{version}}"   # falls back to global variable if set
+    fi
+
+    if [ -z "$version" ]; then
+        echo "Error: version not specified" >&2
+        exit 1
+    fi
 
     echo "Pushing commit and tag for $version..."
     git push
