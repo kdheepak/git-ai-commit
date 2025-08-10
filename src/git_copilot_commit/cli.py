@@ -99,6 +99,13 @@ def ask(prompt, model) -> str:
         },
     )
     text = response.choices[0].message.content
+    text = text.strip()
+    # Remove triple backticks if they wrap the entire text
+    if text.startswith("```") and text.endswith("```"):
+        text = text[3:-3].strip()
+    # Otherwise remove single backticks if they wrap the entire text
+    elif text.startswith("`") and text.endswith("`"):
+        text = text[1:-1].strip()
     return text
 
 
