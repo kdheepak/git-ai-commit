@@ -7,6 +7,7 @@ default:
 commit *args:
     uv run git-copilot-commit commit {{args}}
 
+
 # Get the next version based on bump type
 next-version type="patch":
     #!/usr/bin/env bash
@@ -41,22 +42,14 @@ bump type="patch":
     git tag "$new_version"
 
     echo "✓ Created commit and tag for $new_version"
-    echo "  Run: just release version=$new_version"
+    echo "  Run: `just release $new_version`"
 
 # Push commit, tag, and create GitHub release
-release version='':
+release version:
     #!/usr/bin/env bash
     set -euo pipefail
 
-    # If version wasn't passed positionally, check for named var
-    if [ -z "$version" ]; then
-        version="{{version}}"   # falls back to global variable if set
-    fi
-
-    if [ -z "$version" ]; then
-        echo "Error: version not specified" >&2
-        exit 1
-    fi
+    version="{{version}}"
 
     echo "Pushing commit and tag for $version..."
     git push
