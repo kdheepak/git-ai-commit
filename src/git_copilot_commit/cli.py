@@ -28,7 +28,7 @@ def version_callback(value: bool):
 @app.callback(invoke_without_command=True)
 def main(
     ctx: typer.Context,
-    version: bool = typer.Option(
+    _: bool = typer.Option(
         False, "--version", callback=version_callback, help="Show version and exit"
     ),
 ):
