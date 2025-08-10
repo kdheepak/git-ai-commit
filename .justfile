@@ -42,7 +42,7 @@ bump type="patch":
     git tag "$new_version"
 
     echo "✓ Created commit and tag for $new_version"
-    echo "  Run: `just release $new_version`"
+    echo "  Run: 'just release $new_version'"
 
 # Push commit, tag, and create GitHub release
 release version:
