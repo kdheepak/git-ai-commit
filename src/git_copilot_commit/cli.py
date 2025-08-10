@@ -12,8 +12,7 @@ from rich.table import Table
 import rich
 from pathlib import Path
 
-from pycopilot.copilot import Copilot, CopilotAPIError  # type: ignore
-from pycopilot.auth import Authentication
+from litellm import completion
 from .git import GitRepository, GitError, NotAGitRepositoryError
 from .settings import Settings
 from .version import __version__
@@ -87,6 +86,22 @@ def load_system_prompt() -> str:
     raise typer.Exit(1)
 
 
+def ask(prompt, model) -> str:
+    response = completion(
+        model=model,
+        messages=[
+            {"role": "system", "content": load_system_prompt()},
+            {"role": "user", "content": prompt},
+        ],
+        extra_headers={
+            "editor-version": "vscode/1.85.1",
+            "Copilot-Integration-Id": "vscode-chat",
+        },
+    )
+    text = response.choices[0].message.content
+    return text
+
+
 def generate_commit_message(
     repo: GitRepository, model: str | None = None, context: str = ""
 ) -> str:
@@ -98,9 +113,6 @@ def generate_commit_message(
     if not status.has_staged_changes:
         console.print("[red]No staged changes to commit.[/red]")
         raise typer.Exit()
-
-    system_prompt = load_system_prompt()
-    client = Copilot(system_prompt=system_prompt)
 
     prompt_parts = [
         "`git status`:\n",
@@ -116,11 +128,19 @@ def generate_commit_message(
 
     prompt = "\n".join(prompt_parts)
 
+    if model is None:
+        model = "github_copilot/gpt-4"
+
+    if not model.startswith("github_copilot/"):
+        model = f"github_copilot/{model}"
+
     try:
-        client.reset()
-        response = client.ask(prompt, model=model) if model else client.ask(prompt)
-        return response.content
+        return ask(prompt, model=model)
     except Exception as _:
+        console.print(
+            "Prompt failed, falling back to simpler commit message generation."
+        )
+
         fallback_prompt_parts = [
             "`git status`:\n",
             f"```\n{status.get_porcelain_output()}\n```",
@@ -137,13 +157,7 @@ def generate_commit_message(
 
         fallback_prompt = "\n".join(fallback_prompt_parts)
 
-        client.reset()
-        response = (
-            client.ask(fallback_prompt, model=model)
-            if model
-            else client.ask(fallback_prompt)
-        )
-        return response.content
+        return ask(fallback_prompt, model=model)
 
 
 @app.command()
@@ -221,9 +235,7 @@ def commit(
     ):
         commit_message = generate_commit_message(repo, model, context=context)
 
-    console.print(
-        "[yellow]Generated commit message based on [bold]`git diff --staged`[/] ...[/yellow]"
-    )
+    console.print("[yellow]Generated commit message.[/yellow]")
 
     # Display commit message
     console.print(
@@ -276,47 +288,6 @@ def commit(
 
 
 @app.command()
-def authenticate():
-    """Autheticate with GitHub Copilot."""
-    Authentication().auth()
-
-
-@app.command()
-def models():
-    """List models available for chat in a table."""
-    models = Copilot().models
-
-    console = Console()
-    table = Table(title="Available Models")
-
-    table.add_column("ID", style="cyan", no_wrap=True)
-    table.add_column("Name", style="magenta")
-    table.add_column("Vendor", style="green")
-    table.add_column("Version", style="yellow")
-    table.add_column("Family", style="white")
-    table.add_column("Max Tokens", style="white")
-    table.add_column("Streaming", style="white")
-
-    for model in models:
-        capabilities = model.get("capabilities", {})
-        family = capabilities.get("family", "N/A")
-        max_tokens = capabilities.get("limits", {}).get("max_output_tokens", "N/A")
-        streaming = capabilities.get("supports", {}).get("streaming", False)
-
-        table.add_row(
-            model.get("id", "N/A"),
-            model.get("name", "N/A"),
-            model.get("vendor", "N/A"),
-            model.get("version", "N/A"),
-            family,
-            str(max_tokens),
-            str(streaming),
-        )
-
-    console.print(table)
-
-
-@app.command()
 def config(
     set_default_model: str | None = typer.Option(
         None, "--set-default-model", help="Set default model for commit messages"
@@ -345,52 +316,6 @@ def config(
             console.print("Active prompt file: [red]not found[/red]")
 
         console.print(f"Config file: [dim]{settings.config_file}[/dim]")
-
-
-@app.command()
-def echo(
-    model: str | None = typer.Option(
-        None, "--model", "-m", help="Model to use for generating commit message"
-    ),
-):
-    """
-    Generate commit message from stdin input (useful for pipes).
-    """
-    # Read from stdin
-    input_text = sys.stdin.read()
-
-    if not input_text.strip():
-        console.print("[red]Error: No input provided via stdin[/red]")
-        raise typer.Exit(1)
-
-    # Load settings and use default model if none provided
-    settings = Settings()
-    if model is None:
-        model = settings.default_model
-
-    # Load system prompt and create client
-    system_prompt = load_system_prompt()
-    client = Copilot(system_prompt=system_prompt)
-
-    # Generate commit message from the input
-    prompt = f"""
-`git diff --staged`:
-
-```
-{input_text.strip()}
-```
-
-Generate a conventional commit message based on the input above:"""
-
-    try:
-        response = client.ask(prompt, model=model) if model else client.ask(prompt)
-        # Print the commit message directly to stdout (no rich formatting for pipes)
-        import builtins
-
-        builtins.print(response.content)
-    except CopilotAPIError as e:
-        console.print(f"[red]Error generating commit message: {e}[/red]")
-        raise typer.Exit(1)
 
 
 if __name__ == "__main__":
