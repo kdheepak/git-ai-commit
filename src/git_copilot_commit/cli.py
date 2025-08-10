@@ -248,6 +248,7 @@ def commit(
             f"[bold]{commit_message}[/]",
             title="Commit Message",
             border_style="cyan",
+            width=len(commit_message) + 5,
         )
     )
 
