@@ -7,7 +7,6 @@ default:
 commit *args:
     uv run git-copilot-commit commit {{args}}
 
-
 # Get the next version based on bump type
 next-version type="patch":
     #!/usr/bin/env bash
